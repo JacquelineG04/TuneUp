@@ -1,10 +1,2048 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>TuneUp</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7f6fa">
+    <title>Log in | TuneUp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #17151d;
+            --muted: #74717d;
+            --paper: #f7f6fa;
+            --white: #ffffff;
+            --line: #e7e4ed;
+            --purple: #7044c7;
+            --purple-light: #f0eafb;
+            --deep-purple: #281b3b;
+            --error: #a33342;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--paper);
+            background-image: linear-gradient(#7044c708 1px, transparent 1px), linear-gradient(90deg, #7044c708 1px, transparent 1px);
+            background-size: 32px 32px;
+            color: var(--ink);
+            font-family: "DM Sans", sans-serif;
+        }
+
+        button, input { font: inherit; }
+
+        .page {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .form-side {
+            display: flex;
+            flex-direction: column;
+            width: min(100%, 500px);
+            min-height: min(680px, calc(100vh - 48px));
+            padding: 27px clamp(24px, 6vw, 58px) 21px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--white);
+            box-shadow: 0 16px 48px #2116380d;
+            animation: arrive 550ms ease-out both;
+        }
+
+        .wordmark {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: fit-content;
+            color: var(--ink);
+            font: 700 21px/1 "Space Grotesk", sans-serif;
+            letter-spacing: 0;
+            text-decoration: none;
+        }
+
+        .wordmark-mark {
+            display: grid;
+            display: flex;
+            width: 34px;
+            height: 34px;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            place-items: center;
+            border-radius: 7px;
+            background: var(--purple-light);
+        }
+
+        .wordmark-mark span {
+            width: 3px;
+            border-radius: 4px;
+            background: var(--purple);
+        }
+
+        .wordmark-mark span:nth-child(1) { height: 9px; }
+        .wordmark-mark span:nth-child(2) { height: 16px; }
+        .wordmark-mark span:nth-child(3) { height: 24px; }
+        .wordmark-mark span:nth-child(4) { height: 18px; }
+        .wordmark-mark span:nth-child(5) { height: 11px; }
+
+        .form-wrap {
+            width: min(100%, 410px);
+            margin: auto;
+            padding: 52px 0 40px;
+        }
+
+        .eyebrow {
+            margin: 0 0 13px;
+            color: var(--purple);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font: 600 clamp(36px, 4vw, 48px)/1.08 "Space Grotesk", sans-serif;
+            letter-spacing: 0;
+        }
+
+        .intro {
+            margin: 13px 0 28px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 4px;
+            margin-bottom: 25px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #f6f4f9;
+        }
+
+        .mode-button {
+            min-height: 41px;
+            border: 0;
+            border-radius: 5px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .mode-button[aria-pressed="true"] {
+            background: var(--white);
+            color: var(--ink);
+            box-shadow: 0 1px 3px #20251f18;
+        }
+
+        .field { margin-bottom: 17px; }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            height: 48px;
+            padding: 0 13px;
+            border: 1px solid #d5d6cc;
+            border-radius: 5px;
+            outline: none;
+            background: var(--white);
+            color: var(--ink);
+            transition: border-color 140ms ease, box-shadow 140ms ease;
+        }
+
+        input::placeholder { color: #a0a197; }
+
+        input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px #7044c71c;
+        }
+
+        .password-control { position: relative; }
+        .password-control input { padding-right: 69px; }
+
+        .show-password {
+            position: absolute;
+            top: 50%;
+            right: 11px;
+            padding: 5px;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--purple);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field-hint {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .submit-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 49px;
+            margin-top: 8px;
+            gap: 9px;
+            border: 0;
+            border-radius: 5px;
+            background: var(--deep-purple);
+            color: white;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .submit-button:hover { background: #3a2857; }
+        .submit-button:active { transform: translateY(1px); }
+        .submit-button svg { width: 17px; height: 17px; }
+
+        .status {
+            min-height: 22px;
+            margin: 13px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .status[data-kind="error"] { color: var(--error); }
+        .status[data-kind="success"] { color: #573498; }
+
+        .local-note {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 13px;
+            gap: 9px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .local-note svg { flex: 0 0 15px; width: 15px; height: 15px; margin-top: 1px; }
+
+        .footer {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .form-content[hidden] { display: none; }
+
+        .page:not(.is-app) {
+            display: block;
+            padding: 0;
+            background: var(--white);
+        }
+
+        .page:not(.is-app) .form-side {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            column-gap: clamp(48px, 9vw, 150px);
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 28px clamp(30px, 6vw, 96px) 24px;
+            border: 0;
+            border-radius: 0;
+            background: var(--white);
+            box-shadow: none;
+            animation: none;
+        }
+
+        .page:not(.is-app) .wordmark { grid-column: 1; grid-row: 1; }
+
+        .auth-aside {
+            grid-column: 1;
+            grid-row: 2;
+            align-self: center;
+            max-width: 560px;
+            padding: 38px 0;
+        }
+
+        .auth-aside[hidden] { display: none; }
+
+        .auth-aside h2 {
+            max-width: 520px;
+            margin: 0;
+            font: 600 clamp(42px, 5.2vw, 72px)/1.02 "Space Grotesk", sans-serif;
+        }
+
+        .auth-aside p:last-child {
+            max-width: 390px;
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.65;
+        }
+
+        .auth-spectrum {
+            display: flex;
+            align-items: center;
+            height: 68px;
+            margin: 34px 0 22px;
+            gap: 7px;
+        }
+
+        .auth-spectrum span {
+            width: 7px;
+            height: var(--bar-height);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #a78ae0, var(--purple));
+            transform-origin: center;
+            animation: spectrum 1.8s ease-in-out infinite alternate;
+            animation-delay: var(--bar-delay);
+        }
+
+        @keyframes spectrum {
+            from { transform: scaleY(0.55); }
+            to { transform: scaleY(1); }
+        }
+
+        .page:not(.is-app) .form-wrap {
+            grid-column: 2;
+            grid-row: 1 / 4;
+            align-self: center;
+            width: min(100%, 410px);
+            margin: 0;
+            padding: 36px 0;
+        }
+
+        .page:not(.is-app) .footer { grid-column: 1; grid-row: 3; align-self: end; }
+
+        .page.is-app {
+            display: block;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 0;
+            background: var(--white);
+        }
+
+        .page.is-app .form-side {
+            display: grid;
+            grid-template-columns: 228px minmax(0, 1fr);
+            grid-template-rows: minmax(0, 1fr) auto;
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: var(--white);
+            box-shadow: none;
+            animation: none;
+        }
+
+        .page.is-app .wordmark {
+            grid-column: 1;
+            grid-row: 1;
+            z-index: 1;
+            align-self: start;
+            padding: 24px 20px;
+        }
+
+        .page.is-app .auth-aside { display: none; }
+
+        .app-rail {
+            display: none;
+        }
+
+        .page.is-app .app-rail {
+            display: flex;
+            grid-column: 1;
+            grid-row: 1;
+            flex-direction: column;
+            padding: 88px 14px 20px;
+            border-right: 1px solid var(--line);
+            background: #fbfaff;
+        }
+
+        .rail-label {
+            margin: 0 9px 9px;
+            color: #9893a1;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .rail-link {
+            display: flex;
+            min-height: 42px;
+            align-items: center;
+            padding: 0 11px;
+            gap: 10px;
+            border-radius: 5px;
+            color: #625d6d;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .rail-link[aria-current="page"] { background: var(--purple-light); color: var(--purple); }
+        .rail-link svg { width: 17px; height: 17px; }
+
+        .rail-note {
+            display: flex;
+            align-items: center;
+            margin-top: auto;
+            padding: 14px 10px 0;
+            gap: 10px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .rail-note .wordmark-mark { flex: 0 0 34px; }
+
+        .page.is-app .form-wrap {
+            display: flex;
+            grid-column: 2;
+            grid-row: 1 / 3;
+            justify-content: center;
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 30px clamp(24px, 5vw, 76px);
+        }
+
+        .page.is-app .playlist-view { width: 100%; max-width: 1120px; }
+
+        .page.is-app .footer {
+            grid-column: 1;
+            grid-row: 2;
+            padding: 0 20px 18px;
+            border-right: 1px solid var(--line);
+        }
+
+        .playlist-view[hidden] { display: none; }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .account-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .account-name {
+            max-width: 180px;
+            overflow: hidden;
+            color: var(--muted);
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .header-logout {
+            padding: 8px 11px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: var(--white);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header-logout:hover, .header-connect:hover { border-color: var(--purple); color: var(--purple); }
+
+        .header-connect {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 11px;
+            gap: 6px;
+            border: 1px solid #d9ccef;
+            border-radius: 5px;
+            background: var(--purple-light);
+            color: var(--deep-purple);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .header-connect svg { width: 14px; height: 14px; }
+
+        .connect-dialog {
+            width: min(620px, calc(100vw - 28px));
+            max-height: min(88vh, 760px);
+            padding: 0;
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--ink);
+            box-shadow: 0 24px 80px #1c122d38;
+        }
+
+        .connect-dialog::backdrop { background: #17121f77; backdrop-filter: blur(3px); }
+
+        .connect-dialog-inner { padding: clamp(20px, 5vw, 32px); }
+
+        .connect-dialog-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            gap: 20px;
+        }
+
+        .connect-dialog-header h2 { margin: 0; font: 600 26px/1.15 "Space Grotesk", sans-serif; }
+        .connect-description { margin: 0 0 22px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+        .icon-button {
+            display: grid;
+            flex: 0 0 36px;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: white;
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .icon-button svg { width: 17px; height: 17px; }
+
+        .provider-list { display: grid; gap: 12px; }
+
+        .provider-row {
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #fdfcff;
+        }
+
+        .provider-heading { display: flex; align-items: center; gap: 11px; }
+
+        .provider-mark {
+            display: grid;
+            flex: 0 0 38px;
+            width: 38px;
+            height: 38px;
+            place-items: center;
+            border-radius: 8px;
+            background: #e6f5eb;
+            color: #168548;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .provider-mark.apple { background: #f0edf4; color: #24202b; }
+        .provider-title { font-size: 14px; font-weight: 700; }
+        .provider-state { margin-left: auto; color: var(--muted); font-size: 11px; }
+        .provider-state[data-connected="true"] { color: #168548; font-weight: 700; }
+        .provider-copy { margin: 11px 0 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+        .connect-field { margin: 0 0 12px; }
+        .connect-field label { font-size: 12px; }
+        .connect-field input { height: 42px; font-size: 13px; }
+
+        .redirect-help {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 12px;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .redirect-help code { overflow-wrap: anywhere; color: var(--ink); }
+        .copy-button { flex: 0 0 auto; padding: 4px 0; border: 0; background: transparent; color: var(--purple); cursor: pointer; font-size: 11px; font-weight: 700; }
+
+        .provider-action {
+            min-height: 39px;
+            padding: 0 12px;
+            border: 0;
+            border-radius: 5px;
+            background: var(--deep-purple);
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .provider-action:hover { background: #3a2857; }
+        .provider-action:disabled { cursor: not-allowed; opacity: 0.5; }
+
+        .apple-setup-link { color: var(--purple); font-size: 12px; font-weight: 700; text-decoration: none; }
+        .apple-setup-link:hover { text-decoration: underline; }
+        .connection-message { min-height: 18px; margin: 13px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+        .connection-message[data-kind="error"] { color: var(--error); }
+        .connection-message[data-kind="success"] { color: #168548; }
+
+        .playlist-heading {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            gap: 24px;
+        }
+
+        .playlist-heading .eyebrow { margin-bottom: 10px; }
+        .playlist-heading h1 { font-size: clamp(32px, 4vw, 42px); }
+        .playlist-heading .intro { margin: 10px 0 0; }
+
+        .genre-picker {
+            display: grid;
+            grid-template-columns: auto minmax(180px, 280px);
+            align-items: center;
+            margin: 0 0 19px;
+            gap: 14px;
+        }
+
+        .genre-label { margin: 0; color: var(--muted); font-size: 11px; font-weight: 700; }
+
+        .genre-select {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 34px 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            outline: none;
+            background-color: white;
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .genre-select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px #7044c71c; }
+
+        .action-button {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 14px;
+            gap: 8px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: var(--white);
+            color: var(--ink);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+        }
+
+        .action-button:hover { border-color: var(--purple); background: #faf8ff; }
+        .action-button:active { transform: translateY(1px); }
+
+        .action-button svg { width: 16px; height: 16px; color: var(--purple); }
+
+        .action-button.primary {
+            border-color: var(--deep-purple);
+            background: var(--deep-purple);
+            color: white;
+        }
+
+        .action-button.primary svg { color: white; }
+        .action-button.primary:hover { border-color: #3a2857; background: #3a2857; }
+
+        .mix-panel {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: var(--white);
+        }
+
+        .mix-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 66px;
+            padding: 12px 18px;
+            gap: 16px;
+            border-bottom: 1px solid var(--line);
+            background: #fcfbfe;
+        }
+
+        .mix-meta { min-width: 0; }
+        .mix-title { margin: 0; font: 600 16px/1.3 "Space Grotesk", sans-serif; }
+        .mix-description { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+
+        .track-list { margin: 0; padding: 0; list-style: none; }
+
+        .track-row {
+            display: grid;
+            grid-template-columns: 25px 48px 38px minmax(0, 1fr) 50px;
+            align-items: center;
+            min-height: 70px;
+            padding: 9px 18px;
+            gap: 12px;
+            border-bottom: 1px solid #f0eef3;
+        }
+
+        .track-row:last-child { border-bottom: 0; }
+
+        .track-index {
+            color: #8c8796;
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .cover-art {
+            display: block;
+            width: 48px;
+            height: 48px;
+            overflow: hidden;
+            border-radius: 5px;
+            background: var(--cover-bg, #efe9fa);
+            box-shadow: 0 1px 3px #17151d1a;
+        }
+
+        .cover-art img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 220ms ease;
+        }
+
+        .track-row:hover .cover-art img { transform: scale(1.08); }
+
+        .track-play {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: white;
+            color: var(--deep-purple);
+            cursor: pointer;
+            transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
+        }
+
+        .track-play:hover, .track-play[aria-pressed="true"] {
+            border-color: var(--purple);
+            background: var(--purple);
+            color: white;
+        }
+
+        .track-play svg { width: 14px; height: 14px; }
+
+        .track-text { min-width: 0; }
+        .track-name, .track-artist { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-name { font-size: 13px; font-weight: 700; }
+        .track-link { color: inherit; text-decoration: none; }
+        .track-link:hover { color: var(--purple); text-decoration: underline; }
+        .track-artist { margin-top: 4px; color: var(--muted); font-size: 11px; }
+        .track-duration { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; text-align: right; }
+
+        .playlist-status {
+            min-height: 20px;
+            margin: 12px 2px 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .playlist-status:empty { min-height: 0; margin-top: 0; }
+
+        @media (max-width: 600px) {
+            .page.is-app { padding: 0; }
+            .page.is-app .form-side { min-height: calc(100vh - 16px); padding: 19px 17px 16px; }
+            .page.is-app .form-wrap { padding: 31px 0 25px; }
+            .playlist-heading { align-items: flex-start; flex-direction: column; margin-bottom: 18px; gap: 15px; }
+            .playlist-heading h1 { font-size: 34px; }
+            .playlist-heading .intro { margin-top: 7px; }
+            .track-row { grid-template-columns: 18px 42px 34px minmax(0, 1fr) 38px; min-height: 64px; padding: 8px 10px; gap: 7px; }
+            .cover-art { width: 42px; height: 42px; }
+            .track-play { width: 31px; height: 31px; }
+            .mix-toolbar { padding: 10px 11px; }
+            .action-button { min-height: 39px; padding: 0 10px; }
+            .account-actions { gap: 8px; }
+            .account-name { max-width: 100px; }
+        }
+
+        @keyframes arrive {
+            from { opacity: 0; transform: translateY(9px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 520px) {
+            .page { padding: 12px; }
+            .form-side { min-height: calc(100vh - 24px); padding: 22px 22px 17px; }
+            .form-wrap { padding: 38px 0 30px; }
+            h1 { font-size: 37px; }
+        }
+
+        @media (max-width: 760px) {
+            .page:not(.is-app) .form-side {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: auto auto minmax(0, 1fr) auto;
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding: 22px clamp(22px, 7vw, 54px) 18px;
+            }
+
+            .page:not(.is-app) .wordmark { grid-column: 1; grid-row: 1; }
+            .auth-aside { grid-column: 1; grid-row: 2; padding: 18px 0 4px; }
+            .auth-aside h2 { max-width: 460px; font-size: clamp(28px, 7vw, 36px); }
+            .auth-aside p:last-child { margin-top: 6px; font-size: 13px; }
+            .auth-spectrum { display: none; }
+
+            .page:not(.is-app) .form-wrap {
+                grid-column: 1;
+                grid-row: 3;
+                justify-self: center;
+                align-self: center;
+                width: min(100%, 440px);
+                padding: 12px 0;
+            }
+
+            .page:not(.is-app) .footer { grid-column: 1; grid-row: 4; }
+            .page:not(.is-app) .intro { margin: 8px 0 18px; font-size: 14px; }
+            .page:not(.is-app) .mode-switch { margin-bottom: 17px; }
+            .page:not(.is-app) .field { margin-bottom: 13px; }
+            .page:not(.is-app) .local-note { margin-top: 8px; }
+
+            .page.is-app .form-side {
+                grid-template-columns: minmax(0, 1fr);
+                grid-template-rows: auto auto minmax(0, 1fr) auto;
+                min-height: 100vh;
+                min-height: 100dvh;
+            }
+
+            .page.is-app .wordmark {
+                grid-column: 1;
+                grid-row: 1;
+                padding: 15px 17px;
+            }
+
+            .page.is-app .app-rail {
+                grid-column: 1;
+                grid-row: 2;
+                flex-direction: row;
+                align-items: center;
+                padding: 8px 12px;
+                border-top: 1px solid var(--line);
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+                background: #fbfaff;
+            }
+
+            .rail-label, .rail-note { display: none; }
+            .rail-link { min-height: 36px; padding: 0 11px; }
+
+            .page.is-app .form-wrap {
+                grid-column: 1;
+                grid-row: 3;
+                padding: 21px clamp(13px, 4vw, 24px) 27px;
+            }
+
+            .page.is-app .footer {
+                grid-column: 1;
+                grid-row: 4;
+                padding: 13px 17px;
+                border-top: 1px solid var(--line);
+                border-right: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to TuneUp!</h1>
-    <p>Your personalized playlist generator!</p>
+    <main class="page">
+        <section class="form-side" aria-label="TuneUp account and playlist generator">
+            <a class="wordmark" href="#" aria-label="TuneUp home">
+                <span class="wordmark-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+                TuneUp
+            </a>
+
+            <section class="auth-aside" aria-label="TuneUp introduction">
+                <p class="eyebrow">TUNEUP / YOUR SOUND</p>
+                <div class="auth-spectrum" aria-hidden="true">
+                    <span style="--bar-height: 24px; --bar-delay: -0.3s"></span>
+                    <span style="--bar-height: 46px; --bar-delay: -1.1s"></span>
+                    <span style="--bar-height: 62px; --bar-delay: -0.7s"></span>
+                    <span style="--bar-height: 38px; --bar-delay: -1.5s"></span>
+                    <span style="--bar-height: 54px; --bar-delay: -0.5s"></span>
+                </div>
+                <h2>Find your next repeat.</h2>
+                <p>A new mix for whatever the day sounds like.</p>
+            </section>
+
+            <aside class="app-rail" aria-label="TuneUp navigation">
+                <p class="rail-label">YOUR MUSIC</p>
+                <a class="rail-link" href="#playlist-view" aria-current="page">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Discover
+                </a>
+                <div class="rail-note">
+                    <span class="wordmark-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+                    <span>A little more you, every time.</span>
+                </div>
+            </aside>
+
+            <div class="form-wrap">
+                <div class="form-content" id="form-content">
+                    <p class="eyebrow">Your next favorite is close</p>
+                    <h1 id="form-title">Good to have you back.</h1>
+                    <p class="intro" id="form-intro">Log in to pick up right where your music takes you.</p>
+
+                    <div class="mode-switch" role="group" aria-label="Account action">
+                        <button class="mode-button" id="login-mode" type="button" aria-pressed="true">Log in</button>
+                        <button class="mode-button" id="signup-mode" type="button" aria-pressed="false">Create account</button>
+                    </div>
+
+                    <form id="account-form" novalidate>
+                        <div class="field">
+                            <label for="username">Username</label>
+                            <input id="username" name="username" type="text" autocomplete="username" placeholder="Your username" minlength="3" maxlength="24" required>
+                        </div>
+                        <div class="field">
+                            <label for="password">Password</label>
+                            <div class="password-control">
+                                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+                                <button class="show-password" id="show-password" type="button" aria-pressed="false">Show</button>
+                            </div>
+                            <p class="field-hint" id="password-hint" hidden>Use at least 8 characters.</p>
+                        </div>
+                        <button class="submit-button" id="submit-button" type="submit">
+                            <span id="submit-label">Log in</span>
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <p class="status" id="status" role="status" aria-live="polite"></p>
+                    </form>
+
+                    <p class="local-note">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                        Demo accounts are saved in this browser only. This is not a secure, server-backed account service.
+                    </p>
+                </div>
+
+                <div class="playlist-view" id="playlist-view" hidden>
+                    <div class="app-header">
+                        <span class="account-name" id="account-name"></span>
+                        <div class="account-actions">
+                            <button class="header-connect" id="open-connect-dialog" type="button" aria-haspopup="dialog">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8.5 15.5a5 5 0 0 0 7.1 0l2.8-2.8a5 5 0 0 0-7.1-7.1l-1.6 1.6M15.5 8.5a5 5 0 0 0-7.1 0l-2.8 2.8a5 5 0 0 0 7.1 7.1l1.6-1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                                <span id="connect-button-label">Connect</span>
+                            </button>
+                            <button class="header-logout" id="signout-button" type="button">Log out</button>
+                        </div>
+                    </div>
+                    <div class="playlist-heading">
+                        <div>
+                            <p class="eyebrow">TUNEUP / DISCOVER</p>
+                            <h1>Your next repeat.</h1>
+                            <p class="intro">A fresh little lineup, picked for the mood.</p>
+                        </div>
+                        <button class="action-button primary" id="new-playlist-button" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                            Create another playlist
+                        </button>
+                    </div>
+                    <div class="genre-picker">
+                        <label class="genre-label" for="genre-select">FILTER BY GENRE</label>
+                        <select class="genre-select" id="genre-select" aria-label="Filter music by genre">
+                            <option value="0">All genres</option>
+                            <option value="165">R&amp;B</option>
+                            <option value="152">Rock</option>
+                            <option value="132">Pop</option>
+                        </select>
+                    </div>
+                    <section class="mix-panel" aria-label="Generated playlist">
+                        <div class="mix-toolbar">
+                            <div class="mix-meta">
+                                <h2 class="mix-title" id="mix-title">Soft Focus</h2>
+                                <p class="mix-description" id="mix-description">5 tracks · about 18 minutes</p>
+                            </div>
+                            <button class="action-button" id="shuffle-button" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m18 14 4 4-4 4m0-20 4 4-4 4M2 18h2.5a6 6 0 0 0 4.8-2.4l5.4-7.2A6 6 0 0 1 19.5 6H22M2 6h2.5a6 6 0 0 1 4.8 2.4m3.4 4.6 1.8 2.4a6 6 0 0 0 4.8 2.6H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                Shuffle
+                            </button>
+                        </div>
+                        <ol class="track-list" id="track-list" aria-label="Playlist tracks"></ol>
+                    </section>
+                    <p class="playlist-status" id="playlist-status" role="status" aria-live="polite"></p>
+                    <p class="field-hint" id="preview-note">Previews use sample audio and stop after 3 minutes; original track recordings are not included.</p>
+                </div>
+            </div>
+
+            <div class="footer">Made for the music you haven't found yet.</div>
+        </section>
+
+        <dialog class="connect-dialog" id="connect-dialog" aria-labelledby="connect-dialog-title">
+            <div class="connect-dialog-inner">
+                <div class="connect-dialog-header">
+                    <h2 id="connect-dialog-title">Connect your music</h2>
+                    <button class="icon-button" id="close-connect-dialog" type="button" aria-label="Close connections dialog">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    </button>
+                </div>
+                <p class="connect-description">Link a service to bring its catalog into your mixes.</p>
+                <div class="provider-list">
+                    <section class="provider-row" aria-labelledby="spotify-title">
+                        <div class="provider-heading">
+                            <span class="provider-mark" aria-hidden="true">S</span>
+                            <span class="provider-title" id="spotify-title">Spotify</span>
+                            <span class="provider-state" id="spotify-state">Not connected</span>
+                        </div>
+                        <p class="provider-copy">Authorize read-only access to your profile and search Spotify tracks for your mixes. TuneUp uses PKCE and does not need your Spotify password or a client secret.</p>
+                        <div id="spotify-config">
+                            <div class="connect-field">
+                                <label for="spotify-client-id">Spotify Client ID</label>
+                                <input id="spotify-client-id" name="spotify-client-id" type="text" autocomplete="off" spellcheck="false" placeholder="Paste your app's public client ID">
+                            </div>
+                            <div class="redirect-help">
+                                <span>Register this callback in your Spotify app settings:<br><code id="spotify-redirect-uri"></code></span>
+                                <button class="copy-button" id="copy-redirect-uri" type="button">Copy</button>
+                            </div>
+                        </div>
+                        <button class="provider-action" id="spotify-action" type="button">Connect Spotify</button>
+                    </section>
+
+                    <section class="provider-row" aria-labelledby="apple-title">
+                        <div class="provider-heading">
+                            <span class="provider-mark apple" aria-hidden="true">♪</span>
+                            <span class="provider-title" id="apple-title">Apple Music</span>
+                            <span class="provider-state" id="apple-state">Not connected</span>
+                        </div>
+                        <p class="provider-copy">Connect with MusicKit. Paste a short-lived developer token issued by your server; never put the Apple private signing key in this page.</p>
+                        <div id="apple-config">
+                            <div class="connect-field">
+                                <label for="apple-developer-token">Server-issued MusicKit developer token</label>
+                                <input id="apple-developer-token" name="apple-developer-token" type="password" autocomplete="off" placeholder="Paste a short-lived developer token">
+                            </div>
+                        </div>
+                        <button class="provider-action" id="apple-action" type="button">Connect Apple Music</button>
+                        <p class="field-hint">Requires an Apple Developer account, MusicKit identifier, and a token endpoint on your server.</p>
+                        <a class="apple-setup-link" href="https://developer.apple.com/documentation/musickitjs" target="_blank" rel="noreferrer">MusicKit setup details</a>
+                    </section>
+                </div>
+                <p class="connection-message" id="connection-message" role="status" aria-live="polite"></p>
+            </div>
+        </dialog>
+
+    </main>
+
+    <script>
+        const accountForm = document.querySelector("#account-form");
+        const usernameInput = document.querySelector("#username");
+        const passwordInput = document.querySelector("#password");
+        const statusMessage = document.querySelector("#status");
+        const loginMode = document.querySelector("#login-mode");
+        const signupMode = document.querySelector("#signup-mode");
+        const passwordHint = document.querySelector("#password-hint");
+        const formTitle = document.querySelector("#form-title");
+        const formIntro = document.querySelector("#form-intro");
+        const submitLabel = document.querySelector("#submit-label");
+        const page = document.querySelector(".page");
+        const playlistView = document.querySelector("#playlist-view");
+        const trackList = document.querySelector("#track-list");
+        const playlistStatus = document.querySelector("#playlist-status");
+        const genreSelect = document.querySelector("#genre-select");
+        const connectDialog = document.querySelector("#connect-dialog");
+        const spotifyClientIdInput = document.querySelector("#spotify-client-id");
+        const spotifyActionButton = document.querySelector("#spotify-action");
+        const connectionMessage = document.querySelector("#connection-message");
+        const spotifyClientIdKey = "tuneup-spotify-client-id";
+        const spotifySessionKey = "tuneup-spotify-session";
+        const spotifyOAuthKey = "tuneup-spotify-oauth";
+        const appleSessionKey = "tuneup-apple-music-session";
+        const previewAudio = new Audio();
+        const previewLengthSeconds = 180;
+        let isCreatingAccount = false;
+        let selectedGenre = "all";
+        let selectedGenreId = 0;
+        let selectedGenreName = "All genres";
+        let activeTrackId = null;
+        let previewTimeoutId = null;
+        let genreRequestId = 0;
+        let spotifySearchRequest = 0;
+        let appleSearchRequest = 0;
+        let musicKitLoadPromise = null;
+
+        const mixes = [
+            {
+                id: "soft-focus",
+                genre: "indie",
+                title: "Soft Focus",
+                mood: "Warm indie · slow mornings",
+                tracks: [
+                    { title: "Windowseat", artist: "Mira Sol", duration: "3:24" },
+                    { title: "Paper Moons", artist: "The Sunday Hours", duration: "3:48" },
+                    { title: "Blue Hour Postcard", artist: "Calder Lane", duration: "4:02" },
+                    { title: "Small Satellites", artist: "Lena Wren", duration: "3:31" },
+                    { title: "Almost August", artist: "North Arcade", duration: "3:56" }
+                ]
+            },
+            {
+                id: "electric-bloom",
+                genre: "pop",
+                title: "Electric Bloom",
+                mood: "Left-field pop · bright edges",
+                tracks: [
+                    { title: "Neon Orchard", artist: "Violet Static", duration: "3:17" },
+                    { title: "Sugar Circuit", artist: "Juno & The Shapes", duration: "3:42" },
+                    { title: "Silver Lining Club", artist: "Kite Theory", duration: "3:36" },
+                    { title: "Lucky Receiver", artist: "Marlow June", duration: "2:59" },
+                    { title: "Color in Motion", artist: "The New Soft", duration: "3:51" }
+                ]
+            },
+            {
+                id: "night-bus",
+                genre: "electronic",
+                title: "Night Bus Radio",
+                mood: "After dark · electronic drift",
+                tracks: [
+                    { title: "Last Stop, Low Tide", artist: "Glass District", duration: "4:11" },
+                    { title: "Passenger Light", artist: "Niko Vale", duration: "3:45" },
+                    { title: "Velvet Signal", artist: "Soft Relay", duration: "4:28" },
+                    { title: "City Without Edges", artist: "Alto Static", duration: "3:38" },
+                    { title: "Between the Lines", artist: "Mina Form", duration: "3:57" }
+                ]
+            },
+            {
+                id: "open-window",
+                genre: "acoustic",
+                title: "Open Window",
+                mood: "Open skies · stripped back",
+                tracks: [
+                    { title: "Good Ground", artist: "Owen Fern", duration: "3:26" },
+                    { title: "Wildflower Weather", artist: "June Wilder", duration: "3:54" },
+                    { title: "The Long Way Home", artist: "Parker Moss", duration: "4:06" },
+                    { title: "Apricot Sky", artist: "Nell Harbor", duration: "3:33" },
+                    { title: "Keep the Porch Light", artist: "Hollis Reed", duration: "3:47" }
+                ]
+            },
+            {
+                id: "golden-hour-demos",
+                genre: "indie",
+                title: "Golden Hour Demos",
+                mood: "Guitar pop · soft focus",
+                tracks: [
+                    { title: "Secondhand Summer", artist: "Mira Sol", duration: "3:32" },
+                    { title: "Cedar Street", artist: "North Arcade", duration: "4:01" },
+                    { title: "Half a Map", artist: "The Sunday Hours", duration: "3:45" },
+                    { title: "Lucky Blue", artist: "Lena Wren", duration: "3:18" },
+                    { title: "Slow Parade", artist: "Calder Lane", duration: "3:53" }
+                ]
+            },
+            {
+                id: "stereo-candy",
+                genre: "pop",
+                title: "Stereo Candy",
+                mood: "Bright hooks · big feelings",
+                tracks: [
+                    { title: "Weekend Forever", artist: "Juno & The Shapes", duration: "3:08" },
+                    { title: "Pink Noise", artist: "Violet Static", duration: "3:39" },
+                    { title: "Good at Goodbye", artist: "Marlow June", duration: "3:27" },
+                    { title: "Dancing in the Kitchen", artist: "The New Soft", duration: "3:51" },
+                    { title: "Satellite Crush", artist: "Kite Theory", duration: "3:33" }
+                ]
+            },
+            {
+                id: "afterimage-fm",
+                genre: "electronic",
+                title: "Afterimage FM",
+                mood: "Night drive · soft pulse",
+                tracks: [
+                    { title: "Quiet Machines", artist: "Soft Relay", duration: "4:16" },
+                    { title: "Signal Bloom", artist: "Glass District", duration: "3:52" },
+                    { title: "Nocturne for Two", artist: "Mina Form", duration: "4:09" },
+                    { title: "Blue Neon", artist: "Alto Static", duration: "3:41" },
+                    { title: "Sleep Mode", artist: "Niko Vale", duration: "4:02" }
+                ]
+            },
+            {
+                id: "porchlight-sessions",
+                genre: "acoustic",
+                title: "Porchlight Sessions",
+                mood: "Folk songs · open skies",
+                tracks: [
+                    { title: "Honey on the Table", artist: "June Wilder", duration: "3:46" },
+                    { title: "Creekbed", artist: "Owen Fern", duration: "3:22" },
+                    { title: "Morning, Slowly", artist: "Nell Harbor", duration: "4:03" },
+                    { title: "Wildwood Lines", artist: "Hollis Reed", duration: "3:37" },
+                    { title: "Somewhere, Home", artist: "Parker Moss", duration: "4:12" }
+                ]
+            },
+            {
+                id: "velvet-hours",
+                genre: "rnb",
+                title: "Velvet Hours",
+                mood: "Slow-burn R&B · demo lineup",
+                tracks: [
+                    { title: "Snooze", artist: "SZA", duration: "3:22" },
+                    { title: "Damage", artist: "H.E.R.", duration: "3:44" },
+                    { title: "Good Days", artist: "SZA", duration: "4:39" },
+                    { title: "Session 32", artist: "Summer Walker", duration: "1:53" },
+                    { title: "Heartbreak Anniversary", artist: "Giveon", duration: "3:16" }
+                ]
+            },
+            {
+                id: "blue-hour-rnb",
+                genre: "rnb",
+                title: "Blue Hour R&B",
+                mood: "Silky vocals · demo lineup",
+                tracks: [
+                    { title: "Thinkin Bout You", artist: "Frank Ocean", duration: "3:20" },
+                    { title: "Focus", artist: "H.E.R.", duration: "3:20" },
+                    { title: "Pink + White", artist: "Frank Ocean", duration: "3:04" },
+                    { title: "Sure Thing", artist: "Miguel", duration: "3:15" },
+                    { title: "Japanese Denim", artist: "Daniel Caesar", duration: "4:30" }
+                ]
+            }
+        ];
+
+        const coverArt = {
+            indie: ["photo-1470252649378-9c29740c9fa8", "photo-1470770841072-f978cf4d019e", "photo-1500530855697-b586d89ba3ee", "photo-1475924156734-496f6cac6ec1", "photo-1500534623283-312aade485b7"],
+            pop: ["photo-1492684223066-81342ee5ff30", "photo-1501386761578-eac5c94b800a", "photo-1506157786151-b8491531f063", "photo-1470225620780-dba8ba36b745", "photo-1459749411175-04bf5292ceea"],
+            electronic: ["photo-1519608487953-e999c86e7455", "photo-1519681393784-d120267933ba", "photo-1462331940025-496dfbfc7564", "photo-1534796636912-3b95b3ab5986", "photo-1518837695005-2083093ee35b"],
+            acoustic: ["photo-1500534314209-a25ddb2bd429", "photo-1472396961693-142e6e269027", "photo-1470252649378-9c29740c9fa8", "photo-1500530855697-b586d89ba3ee", "photo-1518837695005-2083093ee35b"],
+            rnb: ["photo-1519608487953-e999c86e7455", "photo-1519681393784-d120267933ba", "photo-1492684223066-81342ee5ff30", "photo-1470225620780-dba8ba36b745", "photo-1506157786151-b8491531f063"]
+        };
+
+        const sampleAudio = [
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"
+        ];
+
+        for (const mix of mixes) {
+            mix.tracks = mix.tracks.map((track, index) => ({
+                ...track,
+                cover: `https://images.unsplash.com/${coverArt[mix.genre][index]}?auto=format&fit=crop&w=160&h=160&q=80`,
+                preview: mix.genre === "rnb" ? null : sampleAudio[(index + mixes.indexOf(mix)) % sampleAudio.length],
+                externalUrl: mix.genre === "rnb"
+                    ? `https://open.spotify.com/search/${encodeURIComponent(`${track.title} ${track.artist}`)}`
+                    : null,
+                catalogSearch: mix.genre === "rnb",
+                provider: mix.genre === "rnb" ? "Spotify" : null
+            }));
+        }
+
+        let currentMix = mixes[0];
+        let currentTracks = [...currentMix.tracks];
+
+        function setStatus(message, kind = "") {
+            statusMessage.textContent = message;
+            statusMessage.dataset.kind = kind;
+        }
+
+        function setMode(createAccount) {
+            isCreatingAccount = createAccount;
+            loginMode.setAttribute("aria-pressed", String(!createAccount));
+            signupMode.setAttribute("aria-pressed", String(createAccount));
+            formTitle.textContent = createAccount ? "Make yourself at home." : "Good to have you back.";
+            formIntro.textContent = createAccount
+                ? "Create an account and let the good listening begin."
+                : "Log in to pick up right where your music takes you.";
+            submitLabel.textContent = createAccount ? "Create account" : "Log in";
+            passwordInput.autocomplete = createAccount ? "new-password" : "current-password";
+            passwordHint.hidden = !createAccount;
+            setStatus("");
+        }
+
+        function accountKey(username) {
+            return `tuneup-account:${username.trim().toLowerCase()}`;
+        }
+
+        function toBase64(bytes) {
+            return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+        }
+
+        async function derivePasswordHash(password, salt) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw",
+                encoder.encode(password),
+                "PBKDF2",
+                false,
+                ["deriveBits"]
+            );
+            const derivedBits = await crypto.subtle.deriveBits(
+                { name: "PBKDF2", salt, iterations: 210000, hash: "SHA-256" },
+                keyMaterial,
+                256
+            );
+            return toBase64(derivedBits);
+        }
+
+        function getSpotifyConnection() {
+            try {
+                const connection = JSON.parse(sessionStorage.getItem(spotifySessionKey) || "null");
+                return connection && connection.expiresAt > Date.now() ? connection : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function getAppleConnection() {
+            try {
+                const connection = JSON.parse(sessionStorage.getItem(appleSessionKey) || "null");
+                return connection && connection.developerToken && connection.musicUserToken ? connection : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function setConnectionMessage(message, kind = "") {
+            connectionMessage.textContent = message;
+            connectionMessage.dataset.kind = kind;
+        }
+
+        function getSpotifyRedirectUri() {
+            const callback = new URL(window.location.href);
+            callback.search = "";
+            callback.hash = "";
+            return callback.toString();
+        }
+
+        function updateSpotifyConnectionUI() {
+            const connection = getSpotifyConnection();
+            const appleConnection = getAppleConnection();
+            const state = document.querySelector("#spotify-state");
+            const appleState = document.querySelector("#apple-state");
+            const clientId = localStorage.getItem(spotifyClientIdKey) || "";
+            spotifyClientIdInput.value = clientId;
+            document.querySelector("#spotify-redirect-uri").textContent = getSpotifyRedirectUri();
+            state.textContent = connection ? `Connected as ${connection.displayName}` : "Not connected";
+            state.dataset.connected = String(Boolean(connection));
+            document.querySelector("#spotify-config").hidden = Boolean(connection);
+            spotifyActionButton.textContent = connection ? "Disconnect Spotify" : "Connect Spotify";
+            appleState.textContent = appleConnection ? "Connected" : "Not connected";
+            appleState.dataset.connected = String(Boolean(appleConnection));
+            document.querySelector("#apple-config").hidden = Boolean(appleConnection);
+            document.querySelector("#apple-action").textContent = appleConnection ? "Disconnect Apple Music" : "Connect Apple Music";
+            const connectedServices = [connection && "Spotify", appleConnection && "Apple Music"].filter(Boolean);
+            document.querySelector("#connect-button-label").textContent = connectedServices.length
+                ? connectedServices.length > 1 ? `${connectedServices.length} connected` : connectedServices[0]
+                : "Connect";
+        }
+
+        function openConnectDialog() {
+            updateSpotifyConnectionUI();
+            setConnectionMessage("");
+            connectDialog.showModal();
+        }
+
+        function toBase64Url(bytes) {
+            return btoa(String.fromCharCode(...new Uint8Array(bytes)))
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/g, "");
+        }
+
+        async function startSpotifyAuthorization() {
+            const clientId = spotifyClientIdInput.value.trim();
+            if (!/^[a-zA-Z0-9]{32}$/.test(clientId)) {
+                setConnectionMessage("Enter the 32-character Client ID from your Spotify developer app.", "error");
+                spotifyClientIdInput.focus();
+                return;
+            }
+
+            if (!window.isSecureContext || window.location.protocol === "file:") {
+                setConnectionMessage("Spotify sign-in needs HTTPS or localhost. Open TuneUp on localhost and register that callback in Spotify.", "error");
+                return;
+            }
+
+            const redirectUri = getSpotifyRedirectUri();
+            const verifier = toBase64Url(crypto.getRandomValues(new Uint8Array(64)));
+            const state = toBase64Url(crypto.getRandomValues(new Uint8Array(24)));
+            const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+            const challenge = toBase64Url(digest);
+            const request = { verifier, state, clientId, redirectUri };
+
+            localStorage.setItem(spotifyClientIdKey, clientId);
+            sessionStorage.setItem(spotifyOAuthKey, JSON.stringify(request));
+            sessionStorage.setItem("tuneup-session-username", document.querySelector("#account-name").textContent.replace(/^Signed in as /, ""));
+
+            const authorizationUrl = new URL("https://accounts.spotify.com/authorize");
+            authorizationUrl.search = new URLSearchParams({
+                client_id: clientId,
+                response_type: "code",
+                redirect_uri: redirectUri,
+                scope: "user-read-private",
+                code_challenge_method: "S256",
+                code_challenge: challenge,
+                state
+            }).toString();
+            window.location.assign(authorizationUrl);
+        }
+
+        async function completeSpotifyAuthorization() {
+            const callbackUrl = new URL(window.location.href);
+            const code = callbackUrl.searchParams.get("code");
+            const providerError = callbackUrl.searchParams.get("error");
+            if (!code && !providerError) return;
+
+            const request = JSON.parse(sessionStorage.getItem(spotifyOAuthKey) || "null");
+            const returnedState = callbackUrl.searchParams.get("state");
+            history.replaceState(null, "", `${callbackUrl.pathname}${callbackUrl.hash}`);
+            sessionStorage.removeItem(spotifyOAuthKey);
+
+            const accountUsername = sessionStorage.getItem("tuneup-session-username");
+            if (accountUsername && localStorage.getItem(accountKey(accountUsername))) showPlaylist(accountUsername);
+
+            if (providerError || !request || returnedState !== request.state) {
+                setConnectionMessage(providerError ? "Spotify sign-in was cancelled." : "Spotify sign-in could not be verified. Try connecting again.", "error");
+                connectDialog.showModal();
+                return;
+            }
+
+            try {
+                const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        grant_type: "authorization_code",
+                        code,
+                        redirect_uri: request.redirectUri,
+                        client_id: request.clientId,
+                        code_verifier: request.verifier
+                    })
+                });
+                const tokenData = await tokenResponse.json();
+                if (!tokenResponse.ok) throw new Error(tokenData.error_description || "Spotify couldn't finish sign-in.");
+
+                const profileResponse = await fetch("https://api.spotify.com/v1/me", {
+                    headers: { Authorization: `Bearer ${tokenData.access_token}` }
+                });
+                const profile = await profileResponse.json();
+                if (!profileResponse.ok) throw new Error("Spotify connected, but TuneUp couldn't read the profile.");
+
+                sessionStorage.setItem(spotifySessionKey, JSON.stringify({
+                    accessToken: tokenData.access_token,
+                    expiresAt: Date.now() + tokenData.expires_in * 1000,
+                    displayName: profile.display_name || profile.id
+                }));
+
+                const username = sessionStorage.getItem("tuneup-session-username");
+                if (username && localStorage.getItem(accountKey(username))) showPlaylist(username);
+                updateSpotifyConnectionUI();
+                setConnectionMessage(`Connected to Spotify as ${profile.display_name || profile.id}.`, "success");
+                connectDialog.showModal();
+                if (selectedGenre === "rnb") loadSpotifyRnbTracks();
+            } catch (error) {
+                setConnectionMessage(error.message || "Spotify sign-in failed. Check the Client ID and callback URL.", "error");
+                connectDialog.showModal();
+            }
+        }
+
+        async function loadSpotifyRnbTracks() {
+            const connection = getSpotifyConnection();
+            if (!connection || selectedGenre !== "rnb") return;
+            const requestId = ++spotifySearchRequest;
+
+            try {
+                const response = await fetch("https://api.spotify.com/v1/search?q=genre%3Ar-n-b&type=track&limit=20", {
+                    headers: { Authorization: `Bearer ${connection.accessToken}` }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error("Spotify couldn't load R&B tracks right now.");
+                if (requestId !== spotifySearchRequest || selectedGenre !== "rnb" || !result.tracks.items.length) return;
+
+                const tracks = result.tracks.items.slice(0, 5).map((track, index) => ({
+                    title: track.name,
+                    artist: track.artists.map((artist) => artist.name).join(", "),
+                    duration: `${Math.floor(track.duration_ms / 60000)}:${String(Math.floor(track.duration_ms / 1000) % 60).padStart(2, "0")}`,
+                    cover: track.album.images?.[0]?.url || `https://images.unsplash.com/${coverArt.rnb[index]}?auto=format&fit=crop&w=160&h=160&q=80`,
+                    preview: track.preview_url,
+                    externalUrl: track.external_urls.spotify,
+                    provider: "Spotify"
+                }));
+                currentMix = { ...currentMix, id: `spotify-rnb-${requestId}`, title: "Spotify R&B Picks", mood: "From Spotify's R&B catalog", tracks };
+                currentTracks = [...tracks];
+                renderPlaylist();
+                playlistStatus.textContent = "Loaded R&B tracks and album art from Spotify.";
+            } catch (error) {
+                if (requestId === spotifySearchRequest) playlistStatus.textContent = error.message;
+            }
+        }
+
+        function loadMusicKit() {
+            if (window.MusicKit) return Promise.resolve(window.MusicKit);
+            if (musicKitLoadPromise) return musicKitLoadPromise;
+
+            musicKitLoadPromise = new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
+                script.async = true;
+                script.onload = () => window.MusicKit ? resolve(window.MusicKit) : reject(new Error("MusicKit didn't initialize."));
+                script.onerror = () => reject(new Error("MusicKit couldn't load. Check your connection."));
+                document.head.append(script);
+            });
+            return musicKitLoadPromise;
+        }
+
+        async function connectAppleMusic() {
+            const developerToken = document.querySelector("#apple-developer-token").value.trim();
+            if (!developerToken) {
+                setConnectionMessage("Paste a short-lived MusicKit developer token issued by your server.", "error");
+                document.querySelector("#apple-developer-token").focus();
+                return;
+            }
+            if (!window.isSecureContext || window.location.protocol === "file:") {
+                setConnectionMessage("Apple Music sign-in needs HTTPS or localhost. Open TuneUp on localhost to continue.", "error");
+                return;
+            }
+
+            const appleButton = document.querySelector("#apple-action");
+            appleButton.disabled = true;
+            appleButton.textContent = "Connecting...";
+
+            try {
+                const MusicKit = await loadMusicKit();
+                await MusicKit.configure({
+                    developerToken,
+                    app: { name: "TuneUp", build: "1.0.0" }
+                });
+                const music = MusicKit.getInstance();
+                const musicUserToken = await music.authorize();
+                sessionStorage.setItem(appleSessionKey, JSON.stringify({ developerToken, musicUserToken }));
+                updateSpotifyConnectionUI();
+                setConnectionMessage("Connected to Apple Music.", "success");
+                if (selectedGenre === "rnb") await loadAppleRnbTracks();
+            } catch (error) {
+                setConnectionMessage(error.message || "Apple Music sign-in failed. Check the token and MusicKit app setup.", "error");
+            } finally {
+                appleButton.disabled = false;
+                updateSpotifyConnectionUI();
+            }
+        }
+
+        async function loadAppleRnbTracks() {
+            const connection = getAppleConnection();
+            if (!connection || selectedGenre !== "rnb") return;
+            const requestId = ++appleSearchRequest;
+
+            try {
+                const response = await fetch("https://api.music.apple.com/v1/catalog/us/search?term=r%26b&types=songs&limit=25", {
+                    headers: {
+                        Authorization: `Bearer ${connection.developerToken}`,
+                        "Music-User-Token": connection.musicUserToken
+                    }
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error("Apple Music couldn't load R&B tracks right now.");
+                const songs = result.results?.songs?.data || [];
+                if (requestId !== appleSearchRequest || selectedGenre !== "rnb" || !songs.length) return;
+
+                const tracks = songs.slice(0, 5).map((song, index) => {
+                    const artwork = song.attributes.artwork;
+                    return {
+                        title: song.attributes.name,
+                        artist: song.attributes.artistName,
+                        duration: song.attributes.durationInMillis
+                            ? `${Math.floor(song.attributes.durationInMillis / 60000)}:${String(Math.floor(song.attributes.durationInMillis / 1000) % 60).padStart(2, "0")}`
+                            : "",
+                        cover: artwork?.url
+                            ? artwork.url.replace("{w}", "160").replace("{h}", "160")
+                            : `https://images.unsplash.com/${coverArt.rnb[index]}?auto=format&fit=crop&w=160&h=160&q=80`,
+                        preview: song.attributes.previews?.[0]?.url || null,
+                        externalUrl: song.attributes.url,
+                        provider: "Apple Music"
+                    };
+                });
+                currentMix = { ...currentMix, id: `apple-rnb-${requestId}`, title: "Apple Music R&B Picks", mood: "From Apple Music's R&B catalog", tracks };
+                currentTracks = [...tracks];
+                renderPlaylist();
+                playlistStatus.textContent = "Loaded R&B tracks and album art from Apple Music.";
+            } catch (error) {
+                if (requestId === appleSearchRequest) playlistStatus.textContent = error.message;
+            }
+        }
+
+        function loadConnectedRnbTracks() {
+            if (getSpotifyConnection()) return loadSpotifyRnbTracks();
+            if (getAppleConnection()) return loadAppleRnbTracks();
+            return loadGenrePlaylist(165, "R&B");
+        }
+        function normalizeTrackText(value) {
+            return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+                .replace(/[^a-z0-9]+/g, " ").trim();
+        }
+
+        async function resolveRnbPreview(track) {
+            if (track.preview) return track.preview;
+
+            const searchTerm = encodeURIComponent(`${track.title} ${track.artist}`);
+            const response = await fetch(`https://api.deezer.com/search?q=${searchTerm}`);
+            if (!response.ok) throw new Error("R&B previews couldn't be reached right now.");
+
+            const result = await response.json();
+            const expectedTitle = normalizeTrackText(track.title);
+            const expectedArtists = normalizeTrackText(track.artist).split(" feat ")[0].split(" ");
+            const match = result.data
+                .filter((item) => item.preview && normalizeTrackText(item.title) === expectedTitle)
+                .map((item) => {
+                    const actualArtist = normalizeTrackText(item.artist.name);
+                    const artistMatches = expectedArtists.filter((word) => word.length > 1 && actualArtist.includes(word)).length;
+                    return { item, artistMatches };
+                })
+                .sort((first, second) => second.artistMatches - first.artistMatches)[0];
+
+            if (!match || match.artistMatches === 0) return null;
+            track.preview = match.item.preview;
+            return track.preview;
+        }
+
+        function escapeHTML(value) {
+            return String(value).replace(/[&<>"']/g, (character) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        function renderPlaylist() {
+            document.querySelector("#mix-title").textContent = currentMix.title;
+            const genreName = currentMix.genreLabel || (currentMix.genre === "rnb" ? "R&B" : `${currentMix.genre[0].toUpperCase()}${currentMix.genre.slice(1)}`);
+            document.querySelector("#mix-description").textContent = `${genreName} · ${currentMix.mood} · ${currentTracks.length} tracks`;
+            document.querySelector("#preview-note").textContent = currentMix.id.startsWith("deezer-chart-")
+                ? "Tracks, covers, and short playable previews are from the selected genre's catalog chart."
+                : currentMix.id.startsWith("spotify-rnb-") || currentMix.id.startsWith("apple-rnb-")
+                ? `${currentMix.id.startsWith("spotify-rnb-") ? "Spotify" : "Apple Music"} tracks open in their music app; available preview clips play here.`
+                : currentMix.genre === "rnb"
+                    ? "Play a licensed R&B preview clip in TuneUp; clips may be shorter than the full song."
+                    : "Previews use sample audio and stop after 3 minutes; original track recordings are not included.";
+            trackList.innerHTML = currentTracks.map((track, index) => `
+                <li class="track-row">
+                    <span class="track-index">${String(index + 1).padStart(2, "0")}</span>
+                    <span class="cover-art"><img src="${escapeHTML(track.cover)}" alt="${escapeHTML(track.title)} album cover" loading="lazy"></span>
+                    <button class="track-play" type="button" data-track-id="${escapeHTML(currentMix.id)}:${escapeHTML(track.title)}" aria-label="${track.externalUrl && !track.preview && !track.catalogSearch ? `Open ${escapeHTML(track.title)} in ${escapeHTML(track.provider)}` : `Play ${track.catalogSearch ? "R&B" : track.provider === "Deezer" ? "catalog" : "3-minute sample"} preview of ${escapeHTML(track.title)}`}" aria-pressed="false">
+                        ${track.externalUrl && !track.preview && !track.catalogSearch
+                            ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 4h6v6m-11 4L20 4M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+                            : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.8c0-.8.9-1.3 1.6-.9l10 6.2a1.1 1.1 0 0 1 0 1.8l-10 6.2a1.1 1.1 0 0 1-1.6-.9z"/></svg>'}
+                    </button>
+                    <span class="track-text"><span class="track-name">${track.externalUrl
+                        ? `<a class="track-link" href="${escapeHTML(track.externalUrl)}" target="_blank" rel="noreferrer">${escapeHTML(track.title)}</a>`
+                        : escapeHTML(track.title)}</span><span class="track-artist">${escapeHTML(track.artist)}</span></span>
+                    <span class="track-duration">${escapeHTML(track.duration)}</span>
+                </li>`).join("");
+        }
+
+        function updatePreviewButton(trackId, isPlaying) {
+            const button = [...trackList.querySelectorAll(".track-play")]
+                .find((item) => item.dataset.trackId === trackId);
+            if (!button) return;
+
+            const track = currentTracks.find((item) => `${currentMix.id}:${item.title}` === trackId);
+            const previewLabel = track?.catalogSearch ? "R&B preview" : track?.provider === "Deezer" ? "catalog preview" : "3-minute sample preview";
+            button.setAttribute("aria-pressed", String(isPlaying));
+            button.setAttribute("aria-label", `${isPlaying ? "Pause" : "Play"} ${previewLabel} of ${button.dataset.trackId.split(":").slice(1).join(":")}`);
+            button.innerHTML = isPlaying
+                ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>'
+                : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.8c0-.8.9-1.3 1.6-.9l10 6.2a1.1 1.1 0 0 1 0 1.8l-10 6.2a1.1 1.1 0 0 1-1.6-.9z"/></svg>';
+        }
+
+        function stopPreview(message = "") {
+            if (previewTimeoutId) clearTimeout(previewTimeoutId);
+            previewTimeoutId = null;
+            previewAudio.pause();
+            if (Number.isFinite(previewAudio.currentTime)) previewAudio.currentTime = 0;
+            if (activeTrackId) updatePreviewButton(activeTrackId, false);
+            activeTrackId = null;
+            if (message) playlistStatus.textContent = message;
+        }
+
+        async function togglePreview(track, trackId) {
+            if (activeTrackId === trackId) {
+                if (!previewAudio.paused) {
+                    previewAudio.pause();
+                    if (previewTimeoutId) clearTimeout(previewTimeoutId);
+                    previewTimeoutId = null;
+                    updatePreviewButton(trackId, false);
+                    playlistStatus.textContent = `Paused ${track.title}.`;
+                    return;
+                }
+
+                try {
+                    await previewAudio.play();
+                    if (activeTrackId !== trackId) return;
+                    previewTimeoutId = setTimeout(() => {
+                        stopPreview(`3-minute preview ended for ${track.title}.`);
+                    }, Math.max(0, previewLengthSeconds - previewAudio.currentTime) * 1000);
+                    updatePreviewButton(trackId, true);
+                    playlistStatus.textContent = `Resumed ${track.title}.`;
+                } catch (error) {
+                    if (activeTrackId !== trackId || error.name === "AbortError") return;
+                    stopPreview("Sample audio couldn't be loaded. Check your connection and try again.");
+                }
+                return;
+            }
+
+            if (!track.preview && track.catalogSearch) {
+                playlistStatus.textContent = `Finding an R&B preview of ${track.title}...`;
+                try {
+                    await resolveRnbPreview(track);
+                } catch (error) {
+                    playlistStatus.textContent = error.message;
+                    return;
+                }
+                if (!track.preview) {
+                    playlistStatus.textContent = `No licensed preview is available for ${track.title}. Open its Spotify link to listen there.`;
+                    return;
+                }
+            }
+
+            if (activeTrackId) stopPreview();
+            activeTrackId = trackId;
+            previewAudio.src = track.preview;
+            previewAudio.currentTime = 0;
+            updatePreviewButton(trackId, true);
+
+            try {
+                await previewAudio.play();
+                if (activeTrackId !== trackId) return;
+                previewTimeoutId = setTimeout(() => {
+                    stopPreview(`3-minute preview ended for ${track.title}.`);
+                }, Math.max(0, previewLengthSeconds - previewAudio.currentTime) * 1000);
+                playlistStatus.textContent = `Playing ${track.catalogSearch ? "an R&B" : track.provider === "Deezer" ? "a catalog" : "a sample"} preview of ${track.title}.`;
+            } catch (error) {
+                if (activeTrackId !== trackId || error.name === "AbortError") return;
+                stopPreview("Sample audio couldn't be loaded. Check your connection and try again.");
+            }
+        }
+
+        previewAudio.addEventListener("ended", () => {
+            const track = currentTracks.find((item) => `${currentMix.id}:${item.title}` === activeTrackId);
+            stopPreview(track?.catalogSearch ? `R&B preview ended for ${track.title}.` : track?.provider === "Deezer" ? `Catalog preview ended for ${track.title}.` : "Sample preview ended.");
+        });
+
+        previewAudio.addEventListener("error", () => {
+            if (activeTrackId && !previewAudio.paused && previewAudio.error?.code !== MediaError.MEDIA_ERR_ABORTED) {
+                stopPreview("Sample audio couldn't be loaded. Check your connection and try again.");
+            }
+        });
+
+        trackList.addEventListener("click", (event) => {
+            const button = event.target.closest(".track-play");
+            if (!button) return;
+
+            const track = currentTracks.find((item) => `${currentMix.id}:${item.title}` === button.dataset.trackId);
+            if (!track) return;
+            if (!track.preview && track.externalUrl && !track.catalogSearch) {
+                window.open(track.externalUrl, "_blank", "noopener,noreferrer");
+                playlistStatus.textContent = `Opening ${track.title} in ${track.provider}.`;
+                return;
+            }
+            togglePreview(track, button.dataset.trackId);
+        });
+
+        function createMix(excludeCurrent = false) {
+            const matchingMixes = selectedGenre === "all"
+                ? mixes
+                : mixes.filter((mix) => mix.genre === selectedGenre);
+            const alternatives = excludeCurrent
+                ? matchingMixes.filter((mix) => mix.id !== currentMix.id)
+                : matchingMixes;
+            const choices = alternatives.length ? alternatives : matchingMixes;
+            currentMix = choices[Math.floor(Math.random() * choices.length)];
+            currentTracks = [...currentMix.tracks];
+            renderPlaylist();
+        }
+
+        async function loadGenreOptions() {
+            try {
+                const response = await fetch("https://api.deezer.com/genre");
+                if (!response.ok) throw new Error("Genre list unavailable.");
+                const result = await response.json();
+                const options = [new Option("All genres", "0"), ...result.data
+                    .filter((genre) => genre.id !== 0)
+                    .map((genre) => new Option(genre.name, String(genre.id)))];
+                genreSelect.replaceChildren(...options);
+                genreSelect.value = String(selectedGenreId);
+            } catch {
+                playlistStatus.textContent = "The complete genre list couldn't load. Try refreshing when you're online.";
+            }
+        }
+
+        async function loadGenrePlaylist(genreId = selectedGenreId, genreName = selectedGenreName, excludeCurrent = false) {
+            const requestId = ++genreRequestId;
+            selectedGenreId = Number(genreId);
+            selectedGenreName = genreName;
+            selectedGenre = selectedGenreId === 0
+                ? "all"
+                : selectedGenreId === 165
+                    ? "rnb"
+                    : normalizeTrackText(genreName).replace(/\s+/g, "-");
+            genreSelect.value = String(selectedGenreId);
+            stopPreview();
+            playlistStatus.textContent = `Finding ${selectedGenreName.toLowerCase()} tracks...`;
+
+            try {
+                const response = await fetch(`https://api.deezer.com/chart/${selectedGenreId}/tracks?limit=50`);
+                if (!response.ok) throw new Error(`Couldn't load ${selectedGenreName} tracks.`);
+                const result = await response.json();
+                if (requestId !== genreRequestId) return;
+
+                const availableTracks = (result.data || []).filter((track) => track.preview && track.album?.cover_medium);
+                if (!availableTracks.length) throw new Error(`There aren't playable ${selectedGenreName.toLowerCase()} previews right now.`);
+
+                const previousIds = new Set(currentTracks.map((track) => track.id));
+                const freshTracks = excludeCurrent
+                    ? availableTracks.filter((track) => !previousIds.has(track.id))
+                    : availableTracks;
+                const pool = freshTracks.length >= Math.min(5, availableTracks.length) ? freshTracks : availableTracks;
+                const shuffled = [...pool];
+                for (let index = shuffled.length - 1; index > 0; index -= 1) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+                }
+
+                const tracks = shuffled.slice(0, 5).map((track) => ({
+                    id: track.id,
+                    title: track.title,
+                    artist: track.artist.name,
+                    duration: `${Math.floor(track.duration / 60)}:${String(track.duration % 60).padStart(2, "0")}`,
+                    cover: track.album.cover_medium,
+                    preview: track.preview,
+                    externalUrl: track.link,
+                    provider: "Deezer"
+                }));
+
+                currentMix = {
+                    id: `deezer-chart-${selectedGenreId}-${requestId}`,
+                    genre: selectedGenre,
+                    genreLabel: selectedGenreName,
+                    title: selectedGenreId === 0 ? "Daily Mix" : `${selectedGenreName} Mix`,
+                    mood: "Fresh chart picks"
+                };
+                currentTracks = tracks;
+                renderPlaylist();
+                playlistStatus.textContent = `Loaded ${tracks.length} tracks from the ${selectedGenreName} chart.`;
+            } catch (error) {
+                if (requestId === genreRequestId) playlistStatus.textContent = error.message;
+            }
+        }
+
+        function showPlaylist(username) {
+            document.querySelector("#form-content").hidden = true;
+            playlistView.hidden = false;
+            page.classList.add("is-app");
+            sessionStorage.setItem("tuneup-session-username", username);
+            document.querySelector("#account-name").textContent = `Signed in as ${username}`;
+            updateSpotifyConnectionUI();
+            selectedGenre = "all";
+            selectedGenreId = 0;
+            selectedGenreName = "All genres";
+            genreSelect.value = "0";
+            playlistStatus.textContent = "";
+            loadGenreOptions();
+            loadGenrePlaylist(0, "All genres");
+        }
+
+        loginMode.addEventListener("click", () => setMode(false));
+        signupMode.addEventListener("click", () => setMode(true));
+
+        document.querySelector("#open-connect-dialog").addEventListener("click", openConnectDialog);
+        document.querySelector("#close-connect-dialog").addEventListener("click", () => connectDialog.close());
+        connectDialog.addEventListener("click", (event) => {
+            if (event.target === connectDialog) connectDialog.close();
+        });
+
+        document.querySelector("#copy-redirect-uri").addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(getSpotifyRedirectUri());
+                setConnectionMessage("Callback URL copied. Add it to your Spotify app settings.", "success");
+            } catch {
+                setConnectionMessage("Clipboard access isn't available here. Copy the callback URL above manually.", "error");
+            }
+        });
+
+        spotifyActionButton.addEventListener("click", async () => {
+            if (getSpotifyConnection()) {
+                sessionStorage.removeItem(spotifySessionKey);
+                spotifySearchRequest += 1;
+                updateSpotifyConnectionUI();
+                setConnectionMessage("Spotify disconnected.");
+                if (currentMix.id.startsWith("spotify-rnb-")) {
+                    currentMix = mixes.find((mix) => mix.genre === "rnb");
+                    currentTracks = [...currentMix.tracks];
+                    renderPlaylist();
+                    loadConnectedRnbTracks();
+                }
+                return;
+            }
+
+            try {
+                await startSpotifyAuthorization();
+            } catch (error) {
+                setConnectionMessage(error.message || "Spotify sign-in couldn't be started.", "error");
+            }
+        });
+
+        document.querySelector("#apple-action").addEventListener("click", async () => {
+            if (getAppleConnection()) {
+                sessionStorage.removeItem(appleSessionKey);
+                appleSearchRequest += 1;
+                updateSpotifyConnectionUI();
+                setConnectionMessage("Apple Music disconnected.");
+                if (currentMix.id.startsWith("apple-rnb-")) {
+                    currentMix = mixes.find((mix) => mix.genre === "rnb");
+                    currentTracks = [...currentMix.tracks];
+                    renderPlaylist();
+                    loadConnectedRnbTracks();
+                }
+                return;
+            }
+            await connectAppleMusic();
+        });
+
+        document.querySelector("#show-password").addEventListener("click", (event) => {
+            const show = passwordInput.type === "password";
+            passwordInput.type = show ? "text" : "password";
+            event.currentTarget.textContent = show ? "Hide" : "Show";
+            event.currentTarget.setAttribute("aria-pressed", String(show));
+        });
+
+        document.querySelector("#shuffle-button").addEventListener("click", () => {
+            stopPreview();
+            for (let index = currentTracks.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [currentTracks[index], currentTracks[swapIndex]] = [currentTracks[swapIndex], currentTracks[index]];
+            }
+            renderPlaylist();
+            playlistStatus.textContent = `Shuffled ${currentMix.title}.`;
+        });
+
+        genreSelect.addEventListener("change", () => {
+            selectedGenreId = Number(genreSelect.value);
+            selectedGenreName = genreSelect.selectedOptions[0].textContent;
+            selectedGenre = selectedGenreId === 0
+                ? "all"
+                : selectedGenreId === 165
+                    ? "rnb"
+                    : normalizeTrackText(selectedGenreName).replace(/\s+/g, "-");
+
+            if (selectedGenre === "rnb" && (getSpotifyConnection() || getAppleConnection())) {
+                loadConnectedRnbTracks();
+            } else {
+                loadGenrePlaylist(selectedGenreId, selectedGenreName);
+            }
+        });
+
+        document.querySelector("#new-playlist-button").addEventListener("click", () => {
+            loadGenrePlaylist(selectedGenreId, selectedGenreName, true);
+        });
+
+        accountForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!/^[a-zA-Z0-9._-]{3,24}$/.test(username)) {
+                setStatus("Choose a username with 3 to 24 letters, numbers, dots, dashes, or underscores.", "error");
+                usernameInput.focus();
+                return;
+            }
+
+            if (isCreatingAccount && password.length < 8) {
+                setStatus("Your password needs at least 8 characters.", "error");
+                passwordInput.focus();
+                return;
+            }
+
+            if (!password) {
+                setStatus("Enter your password to continue.", "error");
+                passwordInput.focus();
+                return;
+            }
+
+            const button = document.querySelector("#submit-button");
+            button.disabled = true;
+            submitLabel.textContent = isCreatingAccount ? "Creating account..." : "Checking...";
+
+            try {
+                const key = accountKey(username);
+                const savedAccount = localStorage.getItem(key);
+
+                if (isCreatingAccount) {
+                    if (savedAccount) {
+                        setStatus("That username is already in use on this browser.", "error");
+                        return;
+                    }
+                    const salt = crypto.getRandomValues(new Uint8Array(16));
+                    const hash = await derivePasswordHash(password, salt);
+                    localStorage.setItem(key, JSON.stringify({ salt: toBase64(salt), hash }));
+                    showPlaylist(username);
+                    return;
+                }
+
+                if (!savedAccount) {
+                    setStatus("We couldn't find an account with that username on this browser.", "error");
+                    return;
+                }
+
+                const account = JSON.parse(savedAccount);
+                const salt = Uint8Array.from(atob(account.salt), (character) => character.charCodeAt(0));
+                const hash = await derivePasswordHash(password, salt);
+                if (hash !== account.hash) {
+                    setStatus("That password doesn't match. Try again.", "error");
+                    return;
+                }
+
+                showPlaylist(username);
+            } catch (error) {
+                console.error("TuneUp account flow failed:", error);
+                setStatus("Accounts need browser storage and a secure connection. Try opening TuneUp on localhost.", "error");
+            } finally {
+                button.disabled = false;
+                submitLabel.textContent = isCreatingAccount ? "Create account" : "Log in";
+            }
+        });
+
+        document.querySelector("#signout-button").addEventListener("click", () => {
+            stopPreview();
+            sessionStorage.removeItem("tuneup-session-username");
+            playlistView.hidden = true;
+            document.querySelector("#form-content").hidden = false;
+            page.classList.remove("is-app");
+            accountForm.reset();
+            setMode(false);
+            usernameInput.focus();
+        });
+
+        updateSpotifyConnectionUI();
+        completeSpotifyAuthorization();
+    </script>
 </body>
 </html>
