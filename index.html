@@ -666,7 +666,7 @@
         .genre-options {
             position: absolute;
             z-index: 5;
-            top: calc(100% + 5px);
+            top: calc(100% + 48px);
             right: 0;
             left: 0;
             max-height: min(320px, 50vh);
@@ -679,6 +679,26 @@
         }
 
         .genre-options[hidden] { display: none; }
+
+        .genre-search {
+            position: absolute;
+            z-index: 6;
+            top: calc(100% + 5px);
+            right: 0;
+            left: 0;
+            width: 100%;
+            min-height: 42px;
+            padding: 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: white;
+            color: var(--ink);
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .genre-search[hidden] { display: none; }
+        .genre-search:focus { border-color: var(--purple); outline: 2px solid #7044c71c; }
 
         .genre-option {
             display: flex;
@@ -1055,9 +1075,11 @@
                                 <span id="genre-selected-value">All genres</span>
                                 <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </button>
+                            <input class="genre-search" id="genre-search" type="search" aria-label="Search genres and subgenres" placeholder="Search genres and subgenres" autocomplete="off" hidden>
                             <div class="genre-options" id="genre-options" role="listbox" aria-labelledby="genre-label" hidden></div>
                         </div>
                     </div>
+                    <p class="field-hint" id="genre-catalog-note">Mixes aim for 10 playable tracks. Search established genres and subgenres; subgenres use the closest chart available from the music catalog.</p>
                     <section class="mix-panel" aria-label="Generated playlist">
                         <div class="mix-toolbar">
                             <div class="mix-meta">
@@ -1183,6 +1205,7 @@
         const genreTrigger = document.querySelector("#genre-trigger");
         const genreSelectedValue = document.querySelector("#genre-selected-value");
         const genreOptions = document.querySelector("#genre-options");
+        const genreSearch = document.querySelector("#genre-search");
         const connectDialog = document.querySelector("#connect-dialog");
         const spotifyClientIdInput = document.querySelector("#spotify-client-id");
         const spotifyActionButton = document.querySelector("#spotify-action");
@@ -1201,10 +1224,38 @@
         let selectedGenreName = "All genres";
         let genreOptionItems = [
             { id: 0, name: "All genres" },
-            { id: 165, name: "R&B" },
-            { id: 152, name: "Rock" },
-            { id: 132, name: "Pop" }
-        ];
+            ...[
+                [132, "Pop", "Adult Contemporary", "Afropop", "Art Pop", "Baroque Pop", "Bedroom Pop", "Bubblegum Pop", "Chamber Pop", "Dance-Pop", "Dream Pop", "Electropop", "Europop", "Hyperpop", "Indie Pop", "J-Pop", "K-Pop", "Power Pop", "Psychedelic Pop", "Synth-Pop", "Teen Pop", "Traditional Pop"],
+                [116, "Rap / Hip Hop", "Alternative Hip Hop", "Boom Bap", "Cloud Rap", "Conscious Hip Hop", "Crunk", "Drill", "East Coast Hip Hop", "Emo Rap", "Experimental Hip Hop", "Gangsta Rap", "G-Funk", "Grime", "Hardcore Hip Hop", "Hyphy", "Instrumental Hip Hop", "Jazz Rap", "Memphis Rap", "Southern Hip Hop", "Trap", "UK Hip Hop", "West Coast Hip Hop"],
+                [122, "Reggaeton", "Dembow", "Latin Trap", "Neoperreo", "Perreo"],
+                [152, "Rock", "Arena Rock", "Blues Rock", "Classic Rock", "Garage Rock", "Glam Rock", "Hard Rock", "Heartland Rock", "Instrumental Rock", "Jam Band", "Krautrock", "Progressive Rock", "Psychedelic Rock", "Rock and Roll", "Rockabilly", "Soft Rock", "Southern Rock", "Surf Rock"],
+                [113, "Dance", "Afro House", "Big Beat", "Breakbeat", "Dancehall", "Disco", "Drum and Bass", "Dubstep", "Eurodance", "Garage", "Hard Dance", "Hardstyle", "House", "Jersey Club", "Juke", "Tech House", "Techno", "Trance", "UK Garage"],
+                [106, "Electro", "Ambient", "Bass Music", "Chiptune", "Downtempo", "Electronica", "French House", "Future Bass", "IDM", "Minimal", "Progressive House", "Synthwave", "Trip Hop", "Witch House"],
+                [165, "R&B", "Alternative R&B", "Contemporary R&B", "Quiet Storm", "New Jack Swing", "Rhythm and Blues"],
+                [85, "Alternative", "Alternative Dance", "Alternative Rock", "Britpop", "Dream Pop", "Emo", "Grunge", "Indie Folk", "Indie Rock", "Lo-Fi", "Madchester", "Post-Punk", "Post-Rock", "Shoegaze", "Ska Punk"],
+                [186, "Christian", "CCM", "Christian Hip Hop", "Christian Rock", "Gospel", "Praise and Worship", "Southern Gospel"],
+                [466, "Folk", "Americana", "Appalachian Folk", "Contemporary Folk", "Folk Rock", "Neofolk", "Singer-Songwriter", "Traditional Folk"],
+                [144, "Reggae", "Roots Reggae", "Dub", "Lovers Rock", "Rocksteady", "Ska"],
+                [129, "Jazz", "Acid Jazz", "Bebop", "Big Band", "Bossa Nova", "Cool Jazz", "Free Jazz", "Hard Bop", "Jazz Fusion", "Latin Jazz", "Smooth Jazz", "Swing", "Vocal Jazz"],
+                [84, "Country", "Alternative Country", "Bluegrass", "Bro-Country", "Country Pop", "Country Rock", "Honky-Tonk", "Nashville Sound", "Outlaw Country", "Red Dirt", "Traditional Country", "Western Swing"],
+                [67, "Salsa", "Afro-Cuban Jazz", "Bachata", "Bolero", "Cha-Cha-Cha", "Merengue", "Son Cubano", "Timba"],
+                [65, "Traditional Mexicano", "Banda", "Corridos", "Mariachi", "Norteño", "Ranchera", "Regional Mexican"],
+                [98, "Classical", "Baroque", "Chamber Music", "Choral", "Classical Crossover", "Contemporary Classical", "Opera", "Orchestral", "Romantic"],
+                [173, "Films/Games", "Anime Soundtracks", "Film Score", "Game Soundtracks", "Musical Theatre", "Television Soundtracks"],
+                [464, "Metal", "Alternative Metal", "Black Metal", "Death Metal", "Doom Metal", "Folk Metal", "Glam Metal", "Gothic Metal", "Grindcore", "Industrial Metal", "Metalcore", "Nu Metal", "Power Metal", "Progressive Metal", "Sludge Metal", "Speed Metal", "Symphonic Metal", "Thrash Metal"],
+                [169, "Soul & Funk", "Funk", "Neo-Soul", "Northern Soul", "Psychedelic Soul", "Soul", "Southern Soul"],
+                [2, "African Music", "Afrobeats", "Amapiano", "Highlife", "Juju", "Kizomba", "Mbalax", "Morna", "Soukous", "West African Music"],
+                [16, "Asian Music", "Cantopop", "C-Pop", "Enka", "J-Rock", "Mandopop", "Trot", "Visual Kei"],
+                [153, "Blues", "Chicago Blues", "Country Blues", "Delta Blues", "Electric Blues", "Jump Blues", "Piedmont Blues"],
+                [75, "Brazilian Music", "Brazilian Funk", "Choro", "Forró", "MPB", "Pagode", "Samba", "Sertanejo"],
+                [71, "Cumbia", "Chicha", "Cumbia Sonidera", "Electro Cumbia", "Modern Cumbia"],
+                [81, "Indian Music", "Bhangra", "Carnatic", "Filmi", "Hindustani Classical", "Indian Folk", "Qawwali"],
+                [95, "Kids", "Children's Songs", "Lullabies", "Nursery Rhymes"],
+                [197, "Latin Music", "Latin Alternative", "Latin Ballad", "Latin Pop", "Latin Rock", "Tango"]
+            ].flatMap(([id, ...names]) => names.map((name) => ({ id: Number(id), name })))
+        ].filter((genre, index, genres) =>
+            genres.findIndex((candidate) => normalizeTrackText(candidate.name) === normalizeTrackText(genre.name)) === index
+        ).sort((first, second) => first.id === 0 ? -1 : second.id === 0 ? 1 : first.name.localeCompare(second.name));
         let genreTypeahead = "";
         let genreTypeaheadTimeout = null;
         const trackHistoryBySource = new Map();
@@ -1472,7 +1523,7 @@
             return error.message || "The account request failed. Please try again.";
         }
 
-        function selectFreshTracks(tracks, historyKey, getTrackId, limit = 5) {
+        function selectFreshTracks(tracks, historyKey, getTrackId, limit = 10) {
             const uniqueTracks = [...new Map(tracks
                 .filter((track) => getTrackId(track))
                 .map((track) => [String(getTrackId(track)), track])).values()];
@@ -1998,29 +2049,37 @@
         }
 
         function renderGenreOptions() {
-            genreOptions.replaceChildren(...genreOptionItems.map((genre) => {
+            const query = normalizeTrackText(genreSearch.value);
+            const filteredGenres = genreOptionItems.filter((genre) => !query || normalizeTrackText(genre.name).includes(query));
+            genreOptions.replaceChildren(...filteredGenres.map((genre, index) => {
                 const option = document.createElement("div");
                 option.className = "genre-option";
-                option.id = `genre-option-${genre.id}`;
+                option.id = `genre-option-${genre.id}-${index}`;
                 option.dataset.genreId = String(genre.id);
+                option.dataset.genreName = genre.name;
                 option.setAttribute("role", "option");
-                option.setAttribute("aria-selected", String(genre.id === selectedGenreId));
+                option.setAttribute("aria-selected", String(genre.id === selectedGenreId && genre.name === selectedGenreName));
                 option.tabIndex = -1;
                 option.textContent = genre.name;
                 return option;
             }));
-            const selectedGenreOption = genreOptionItems.find((genre) => genre.id === selectedGenreId);
-            if (selectedGenreOption) {
-                selectedGenreName = selectedGenreOption.name;
-                genreSelectedValue.textContent = selectedGenreName;
-            }
+            genreOptions.setAttribute("aria-label", `${filteredGenres.length} matching genres`);
         }
 
         function setGenreMenuOpen(isOpen, focusSelected = false) {
             genreOptions.hidden = !isOpen;
+            genreSearch.hidden = !isOpen;
             genreTrigger.setAttribute("aria-expanded", String(isOpen));
-            if (!isOpen) return;
+            if (!isOpen) {
+                genreSearch.value = "";
+                renderGenreOptions();
+                return;
+            }
 
+            if (focusSelected) {
+                genreSearch.focus();
+                return;
+            }
             const selectedOption = genreOptions.querySelector('[aria-selected="true"]');
             const firstOption = genreOptions.querySelector('[role="option"]');
             (focusSelected ? selectedOption || firstOption : firstOption)?.focus();
@@ -2035,11 +2094,13 @@
         function changeGenre(genreId, genreName) {
             selectedGenreId = Number(genreId);
             selectedGenreName = genreName;
+            genreSelectedValue.textContent = selectedGenreName;
             selectedGenre = selectedGenreId === 0
                 ? "all"
-                : selectedGenreId === 165
+                : selectedGenreId === 165 && normalizeTrackText(selectedGenreName) === "r b"
                     ? "rnb"
                     : normalizeTrackText(selectedGenreName).replace(/\s+/g, "-");
+            genreSearch.value = "";
             renderGenreOptions();
             setGenreMenuOpen(false);
             genreTrigger.focus();
@@ -2058,16 +2119,27 @@
         genreTrigger.addEventListener("keydown", (event) => {
             if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                 event.preventDefault();
-                setGenreMenuOpen(true, true);
+                setGenreMenuOpen(true, false);
             } else if (event.key === "Escape" && !genreOptions.hidden) {
                 setGenreMenuOpen(false);
+            }
+        });
+
+        genreSearch.addEventListener("input", renderGenreOptions);
+        genreSearch.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                focusGenreOption(0);
+            } else if (event.key === "Escape") {
+                setGenreMenuOpen(false);
+                genreTrigger.focus();
             }
         });
 
         genreOptions.addEventListener("click", (event) => {
             const option = event.target.closest('[role="option"]');
             if (!option) return;
-            changeGenre(option.dataset.genreId, option.textContent);
+            changeGenre(option.dataset.genreId, option.dataset.genreName);
         });
 
         genreOptions.addEventListener("keydown", (event) => {
@@ -2106,16 +2178,22 @@
                 if (!response.ok) throw new Error("Genre list unavailable.");
                 const result = await response.json();
                 if (!Array.isArray(result.data)) throw new Error("The genre list response was invalid.");
-                genreOptionItems = [
-                    { id: 0, name: "All genres" },
-                    ...result.data
-                        .filter((genre) => genre.id !== 0)
-                        .map((genre) => ({ id: Number(genre.id), name: genre.name }))
-                ];
+                const providerGenres = result.data
+                    .filter((genre) => genre.id !== 0)
+                    .map((genre) => ({ id: Number(genre.id), name: genre.name }));
+                const seen = new Set(genreOptionItems.map((genre) => `${genre.id}:${normalizeTrackText(genre.name)}`));
+                const additionalGenres = providerGenres.filter((genre) => {
+                    const key = `${genre.id}:${normalizeTrackText(genre.name)}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+                genreOptionItems.push(...additionalGenres);
+                genreOptionItems.sort((first, second) => first.id === 0 ? -1 : second.id === 0 ? 1 : first.name.localeCompare(second.name));
                 renderGenreOptions();
             } catch (error) {
                 renderGenreOptions();
-                playlistStatus.textContent = `${error.message || "The complete genre list couldn't load."} Showing the available genres instead.`;
+                playlistStatus.textContent = `${error.message || "Additional provider genres couldn't load."} The built-in genre catalog is still available.`;
             }
         }
 
@@ -2125,7 +2203,7 @@
             selectedGenreName = genreName;
             selectedGenre = selectedGenreId === 0
                 ? "all"
-                : selectedGenreId === 165
+                : selectedGenreId === 165 && normalizeTrackText(genreName) === "r b"
                     ? "rnb"
                     : normalizeTrackText(genreName).replace(/\s+/g, "-");
             renderGenreOptions();
