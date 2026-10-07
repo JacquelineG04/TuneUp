@@ -1015,6 +1015,7 @@
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                         <button class="text-button" id="resend-confirmation-button" type="button" hidden>Resend confirmation email</button>
+                        <button class="text-button" id="guest-access-button" type="button">Continue as guest — no account needed</button>
                         <p class="status" id="status" role="status" aria-live="polite"></p>
                     </form>
                     <p class="field-hint auth-setup-note" id="auth-setup-note" hidden>Account sign-in needs configuration. Set the Supabase project URL and anon key in this page, enable email sign-in, and add this site to Supabase's redirect URL allow list. <a href="./SUPABASE_SETUP.md" target="_blank" rel="noreferrer">Setup instructions</a>.</p>
@@ -1168,6 +1169,8 @@
         const passwordHint = document.querySelector("#password-hint");
         const forgotPasswordButton = document.querySelector("#forgot-password-button");
         const resendConfirmationButton = document.querySelector("#resend-confirmation-button");
+        const guestAccessButton = document.querySelector("#guest-access-button");
+        const signoutButton = document.querySelector("#signout-button");
         const authSetupNote = document.querySelector("#auth-setup-note");
         const formTitle = document.querySelector("#form-title");
         const formIntro = document.querySelector("#form-intro");
@@ -1379,6 +1382,7 @@
 
         let currentMix = mixes[0];
         let currentTracks = [...currentMix.tracks];
+        let isGuestSession = false;
 
         function setStatus(message, kind = "") {
             statusMessage.textContent = message;
@@ -2325,11 +2329,13 @@
             }
         }
 
-        function showPlaylist(username) {
+        function showPlaylist(username, guest = false) {
+            isGuestSession = guest;
             document.querySelector("#form-content").hidden = true;
             playlistView.hidden = false;
             page.classList.add("is-app");
-            document.querySelector("#account-name").textContent = `Signed in as ${username}`;
+            document.querySelector("#account-name").textContent = guest ? "Guest mode" : `Signed in as ${username}`;
+            signoutButton.textContent = guest ? "Exit guest mode" : "Log out";
             updateSpotifyConnectionUI();
             selectedGenre = "all";
             selectedGenreId = 0;
@@ -2342,6 +2348,7 @@
 
         loginMode.addEventListener("click", () => setMode(false));
         signupMode.addEventListener("click", () => setMode(true));
+        guestAccessButton.addEventListener("click", () => showPlaylist("Guest", true));
         forgotPasswordButton.addEventListener("click", () => {
             if (authMode === "recovery") {
                 setMode(false);
@@ -2568,16 +2575,20 @@
             }
         });
 
-        document.querySelector("#signout-button").addEventListener("click", async () => {
-            const { error } = await supabaseClient.auth.signOut();
-            if (error) {
-                playlistStatus.textContent = error.message || "Could not sign out.";
-                return;
+        signoutButton.addEventListener("click", async () => {
+            if (!isGuestSession && supabaseClient) {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) {
+                    playlistStatus.textContent = error.message || "Could not sign out.";
+                    return;
+                }
             }
+            isGuestSession = false;
             stopPreview();
             playlistView.hidden = true;
             document.querySelector("#form-content").hidden = false;
             page.classList.remove("is-app");
+            signoutButton.textContent = "Log out";
             accountForm.reset();
             setMode(false);
             emailInput.focus();

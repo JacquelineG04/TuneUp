@@ -11,7 +11,7 @@ TuneUp is a static page. Account recovery and playlist export need the following
 5. Set the minimum password length to 8 in Supabase Auth settings. TuneUp's account form accepts passwords from 8 through 128 characters and usernames from 3 through 24 letters, numbers, dots, dashes, or underscores.
 6. Keep the confirmation and password-recovery templates using Supabase's confirmation URL (for example, `{{ .ConfirmationURL }}`); the app supplies the deployed page as the redirect destination.
 
-Login uses email and password. New accounts also collect a username. On the create-account form, users can request another confirmation email. Supabase rate-limits email requests; wait for its cooldown before retrying, and configure custom SMTP for reliable delivery. The previous browser-only demo accounts are not migrated to Supabase.
+Login uses email and password. New accounts also collect a username. Visitors can choose **Continue as guest** to use TuneUp without signing in; guest mode does not create an account. On the create-account form, users can request another confirmation email. Supabase rate-limits email requests; wait for its cooldown before retrying, and configure custom SMTP for reliable delivery. The previous browser-only demo accounts are not migrated to Supabase.
 
 ## Spotify playlist export
 
