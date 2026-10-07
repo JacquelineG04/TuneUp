@@ -199,6 +199,21 @@
             font-size: 12px;
         }
 
+        .field[hidden] { display: none; }
+
+        .text-button {
+            padding: 5px 0;
+            border: 0;
+            background: transparent;
+            color: var(--purple);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .text-button:hover { text-decoration: underline; }
+        .text-button[hidden] { display: none; }
+
         .submit-button {
             display: flex;
             align-items: center;
@@ -621,23 +636,67 @@
             gap: 14px;
         }
 
-        .genre-label { margin: 0; color: var(--muted); font-size: 11px; font-weight: 700; }
+        .genre-label { margin: 0; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 700; }
 
-        .genre-select {
+        .genre-menu-wrap { position: relative; }
+
+        .genre-trigger {
+            display: flex;
             width: 100%;
             min-height: 42px;
-            padding: 0 34px 0 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
             border: 1px solid var(--line);
             border-radius: 5px;
-            outline: none;
-            background-color: white;
+            background: white;
+            color: var(--ink);
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .genre-trigger:hover, .genre-trigger[aria-expanded="true"] { border-color: var(--purple); }
+        .genre-trigger:focus-visible { outline: none; box-shadow: 0 0 0 3px #7044c71c; }
+        .genre-trigger svg { width: 16px; height: 16px; flex: 0 0 auto; transition: transform 140ms ease; }
+        .genre-trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+        .genre-options {
+            position: absolute;
+            z-index: 5;
+            top: calc(100% + 5px);
+            right: 0;
+            left: 0;
+            max-height: min(320px, 50vh);
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: white;
+            box-shadow: 0 12px 28px #17121f1c;
+        }
+
+        .genre-options[hidden] { display: none; }
+
+        .genre-option {
+            display: flex;
+            width: 100%;
+            min-height: 36px;
+            align-items: center;
+            padding: 7px 9px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
             color: var(--ink);
             cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
+            text-align: left;
         }
 
-        .genre-select:focus { border-color: var(--purple); box-shadow: 0 0 0 3px #7044c71c; }
+        .genre-option:hover, .genre-option:focus-visible { outline: none; background: #f5f1fc; }
+        .genre-option[aria-selected="true"] { background: var(--purple-light); color: var(--purple); font-weight: 700; }
 
         .action-button {
             display: inline-flex;
@@ -680,6 +739,7 @@
 
         .mix-toolbar {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             min-height: 66px;
@@ -771,6 +831,16 @@
         }
 
         .playlist-status:empty { min-height: 0; margin-top: 0; }
+
+        .mix-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .auth-setup-note { margin-top: 12px; }
 
         @media (max-width: 600px) {
             .page.is-app { padding: 0; }
@@ -923,28 +993,34 @@
                     </div>
 
                     <form id="account-form" novalidate>
+                        <div class="field" id="email-field">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" maxlength="254" required>
+                        </div>
                         <div class="field">
                             <label for="username">Username</label>
-                            <input id="username" name="username" type="text" autocomplete="username" placeholder="Your username" minlength="3" maxlength="24" required>
+                            <input id="username" name="username" type="text" autocomplete="username" placeholder="3–24 letters, numbers, dots, dashes, or underscores" minlength="3" maxlength="24" pattern="[a-zA-Z0-9._-]{3,24}" required>
                         </div>
-                        <div class="field">
+                        <div class="field" id="password-field">
                             <label for="password">Password</label>
                             <div class="password-control">
-                                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" required>
+                                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" minlength="8" maxlength="128" required>
                                 <button class="show-password" id="show-password" type="button" aria-pressed="false">Show</button>
                             </div>
-                            <p class="field-hint" id="password-hint" hidden>Use at least 8 characters.</p>
+                            <p class="field-hint" id="password-hint" hidden>Use 8–128 characters.</p>
                         </div>
+                        <button class="text-button" id="forgot-password-button" type="button">Forgot password?</button>
                         <button class="submit-button" id="submit-button" type="submit">
                             <span id="submit-label">Log in</span>
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                         <p class="status" id="status" role="status" aria-live="polite"></p>
                     </form>
+                    <p class="field-hint auth-setup-note" id="auth-setup-note" hidden>Account sign-in needs configuration. Set the Supabase project URL and anon key in this page, enable email sign-in, and add this site to Supabase's redirect URL allow list. <a href="./SUPABASE_SETUP.md" target="_blank" rel="noreferrer">Setup instructions</a>.</p>
 
                     <p class="local-note">
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                        Demo accounts are saved in this browser only. This is not a secure, server-backed account service.
+                        Sign-in and email recovery are managed by Supabase. TuneUp never stores your account password locally.
                     </p>
                 </div>
 
@@ -971,13 +1047,14 @@
                         </button>
                     </div>
                     <div class="genre-picker">
-                        <label class="genre-label" for="genre-select">FILTER BY GENRE</label>
-                        <select class="genre-select" id="genre-select" aria-label="Filter music by genre">
-                            <option value="0">All genres</option>
-                            <option value="165">R&amp;B</option>
-                            <option value="152">Rock</option>
-                            <option value="132">Pop</option>
-                        </select>
+                        <label class="genre-label" id="genre-label" for="genre-trigger">FILTER BY GENRE</label>
+                        <div class="genre-menu-wrap" id="genre-menu-wrap">
+                            <button class="genre-trigger" id="genre-trigger" type="button" aria-haspopup="listbox" aria-controls="genre-options" aria-expanded="false" aria-labelledby="genre-label genre-selected-value">
+                                <span id="genre-selected-value">All genres</span>
+                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                            <div class="genre-options" id="genre-options" role="listbox" aria-labelledby="genre-label" hidden></div>
+                        </div>
                     </div>
                     <section class="mix-panel" aria-label="Generated playlist">
                         <div class="mix-toolbar">
@@ -985,10 +1062,18 @@
                                 <h2 class="mix-title" id="mix-title">Soft Focus</h2>
                                 <p class="mix-description" id="mix-description">5 tracks · about 18 minutes</p>
                             </div>
-                            <button class="action-button" id="shuffle-button" type="button">
-                                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m18 14 4 4-4 4m0-20 4 4-4 4M2 18h2.5a6 6 0 0 0 4.8-2.4l5.4-7.2A6 6 0 0 1 19.5 6H22M2 6h2.5a6 6 0 0 1 4.8 2.4m3.4 4.6 1.8 2.4a6 6 0 0 0 4.8 2.6H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                Shuffle
-                            </button>
+                            <div class="mix-actions">
+                                <button class="action-button" id="add-to-spotify-button" type="button" disabled title="Connect Spotify to save playlists">
+                                    Add to Spotify
+                                </button>
+                                <button class="action-button" id="add-to-apple-button" type="button" disabled title="Connect Apple Music to save playlists">
+                                    Add to Apple Music
+                                </button>
+                                <button class="action-button" id="shuffle-button" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m18 14 4 4-4 4m0-20 4 4-4 4M2 18h2.5a6 6 0 0 0 4.8-2.4l5.4-7.2A6 6 0 0 1 19.5 6H22M2 6h2.5a6 6 0 0 1 4.8 2.4m3.4 4.6 1.8 2.4a6 6 0 0 0 4.8 2.6H22" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    Shuffle songs
+                                </button>
+                            </div>
                         </div>
                         <ol class="track-list" id="track-list" aria-label="Playlist tracks"></ol>
                     </section>
@@ -1008,7 +1093,7 @@
                         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                     </button>
                 </div>
-                <p class="connect-description">Link a service to bring its catalog into your mixes.</p>
+                <p class="connect-description">Link a service to search its catalog and save your TuneUp playlists.</p>
                 <div class="provider-list">
                     <section class="provider-row" aria-labelledby="spotify-title">
                         <div class="provider-heading">
@@ -1016,7 +1101,7 @@
                             <span class="provider-title" id="spotify-title">Spotify</span>
                             <span class="provider-state" id="spotify-state">Not connected</span>
                         </div>
-                        <p class="provider-copy">Authorize read-only access to your profile and search Spotify tracks for your mixes. TuneUp uses PKCE and does not need your Spotify password or a client secret.</p>
+                        <p class="provider-copy">Authorize playlist creation and track search. TuneUp uses PKCE and does not need your Spotify password or a client secret.</p>
                         <div id="spotify-config">
                             <div class="connect-field">
                                 <label for="spotify-client-id">Spotify Client ID</label>
@@ -1036,7 +1121,7 @@
                             <span class="provider-title" id="apple-title">Apple Music</span>
                             <span class="provider-state" id="apple-state">Not connected</span>
                         </div>
-                        <p class="provider-copy">Connect with MusicKit. Paste a short-lived developer token issued by your server; never put the Apple private signing key in this page.</p>
+                        <p class="provider-copy">Connect with MusicKit to find songs and create playlists. Paste a short-lived developer token issued by your server; never put the Apple private signing key in this page.</p>
                         <div id="apple-config">
                             <div class="connect-field">
                                 <label for="apple-developer-token">Server-issued MusicKit developer token</label>
@@ -1054,14 +1139,34 @@
 
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
+        const SUPABASE_URL = "https://waguuzrvrytgncdxwgqb.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_ZuUh_bOdQikKC7YmAJ0gWw_FgXpFR65";
+        let supabaseClient = null;
+        let supabaseConfigurationError = "";
+        if (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch (error) {
+                console.error("Supabase configuration is invalid:", error);
+                supabaseConfigurationError = `Supabase configuration is invalid: ${error.message}`;
+            }
+        }
         const accountForm = document.querySelector("#account-form");
+        const emailInput = document.querySelector("#email");
+        const emailField = document.querySelector("#email-field");
+        const usernameField = document.querySelector("#username").closest(".field");
         const usernameInput = document.querySelector("#username");
         const passwordInput = document.querySelector("#password");
+        const passwordField = document.querySelector("#password-field");
         const statusMessage = document.querySelector("#status");
         const loginMode = document.querySelector("#login-mode");
         const signupMode = document.querySelector("#signup-mode");
+        const modeSwitch = document.querySelector(".mode-switch");
         const passwordHint = document.querySelector("#password-hint");
+        const forgotPasswordButton = document.querySelector("#forgot-password-button");
+        const authSetupNote = document.querySelector("#auth-setup-note");
         const formTitle = document.querySelector("#form-title");
         const formIntro = document.querySelector("#form-intro");
         const submitLabel = document.querySelector("#submit-label");
@@ -1069,7 +1174,10 @@
         const playlistView = document.querySelector("#playlist-view");
         const trackList = document.querySelector("#track-list");
         const playlistStatus = document.querySelector("#playlist-status");
-        const genreSelect = document.querySelector("#genre-select");
+        const genreMenuWrap = document.querySelector("#genre-menu-wrap");
+        const genreTrigger = document.querySelector("#genre-trigger");
+        const genreSelectedValue = document.querySelector("#genre-selected-value");
+        const genreOptions = document.querySelector("#genre-options");
         const connectDialog = document.querySelector("#connect-dialog");
         const spotifyClientIdInput = document.querySelector("#spotify-client-id");
         const spotifyActionButton = document.querySelector("#spotify-action");
@@ -1078,12 +1186,23 @@
         const spotifySessionKey = "tuneup-spotify-session";
         const spotifyOAuthKey = "tuneup-spotify-oauth";
         const appleSessionKey = "tuneup-apple-music-session";
+        const addToSpotifyButton = document.querySelector("#add-to-spotify-button");
+        const addToAppleButton = document.querySelector("#add-to-apple-button");
         const previewAudio = new Audio();
         const previewLengthSeconds = 180;
-        let isCreatingAccount = false;
+        let authMode = "login";
         let selectedGenre = "all";
         let selectedGenreId = 0;
         let selectedGenreName = "All genres";
+        let genreOptionItems = [
+            { id: 0, name: "All genres" },
+            { id: 165, name: "R&B" },
+            { id: 152, name: "Rock" },
+            { id: 132, name: "Pop" }
+        ];
+        let genreTypeahead = "";
+        let genreTypeaheadTimeout = null;
+        const trackHistoryBySource = new Map();
         let activeTrackId = null;
         let previewTimeoutId = null;
         let genreRequestId = 0;
@@ -1265,42 +1384,115 @@
         }
 
         function setMode(createAccount) {
-            isCreatingAccount = createAccount;
+            authMode = createAccount ? "signup" : "login";
             loginMode.setAttribute("aria-pressed", String(!createAccount));
             signupMode.setAttribute("aria-pressed", String(createAccount));
             formTitle.textContent = createAccount ? "Make yourself at home." : "Good to have you back.";
             formIntro.textContent = createAccount
                 ? "Create an account and let the good listening begin."
-                : "Log in to pick up right where your music takes you.";
+                : "Log in with your email to pick up right where your music takes you.";
             submitLabel.textContent = createAccount ? "Create account" : "Log in";
+            emailField.hidden = false;
+            emailInput.required = true;
+            usernameField.hidden = !createAccount;
+            usernameInput.required = createAccount;
+            passwordField.hidden = false;
+            passwordInput.required = true;
+            passwordInput.minLength = 8;
+            passwordInput.maxLength = 128;
             passwordInput.autocomplete = createAccount ? "new-password" : "current-password";
             passwordHint.hidden = !createAccount;
+            passwordHint.textContent = "Use 8–128 characters.";
+            forgotPasswordButton.hidden = createAccount;
+            forgotPasswordButton.textContent = "Forgot password?";
+            modeSwitch.hidden = false;
+            document.querySelector("#submit-button").hidden = false;
             setStatus("");
         }
 
-        function accountKey(username) {
-            return `tuneup-account:${username.trim().toLowerCase()}`;
+        function setRecoveryMode() {
+            authMode = "recovery";
+            modeSwitch.hidden = true;
+            formTitle.textContent = "Reset your password.";
+            formIntro.textContent = "We'll email you a secure link to choose a new password.";
+            emailField.hidden = false;
+            emailInput.required = true;
+            usernameField.hidden = true;
+            usernameInput.required = false;
+            passwordField.hidden = true;
+            passwordInput.required = false;
+            passwordHint.hidden = true;
+            forgotPasswordButton.hidden = false;
+            forgotPasswordButton.textContent = "Back to log in";
+            submitLabel.textContent = "Send recovery email";
+            document.querySelector("#submit-button").hidden = false;
+            setStatus("");
         }
 
-        function toBase64(bytes) {
-            return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+        function setResetMode() {
+            authMode = "reset";
+            modeSwitch.hidden = true;
+            formTitle.textContent = "Choose a new password.";
+            formIntro.textContent = "Use a password between 8 and 128 characters.";
+            emailField.hidden = true;
+            emailInput.required = false;
+            usernameField.hidden = true;
+            usernameInput.required = false;
+            passwordField.hidden = false;
+            passwordInput.required = true;
+            passwordInput.minLength = 8;
+            passwordInput.maxLength = 128;
+            passwordInput.value = "";
+            passwordInput.autocomplete = "new-password";
+            passwordHint.hidden = false;
+            passwordHint.textContent = "Use 8–128 characters.";
+            forgotPasswordButton.hidden = true;
+            submitLabel.textContent = "Save new password";
+            document.querySelector("#submit-button").hidden = false;
+            setStatus("");
         }
 
-        async function derivePasswordHash(password, salt) {
-            const encoder = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey(
-                "raw",
-                encoder.encode(password),
-                "PBKDF2",
-                false,
-                ["deriveBits"]
-            );
-            const derivedBits = await crypto.subtle.deriveBits(
-                { name: "PBKDF2", salt, iterations: 210000, hash: "SHA-256" },
-                keyMaterial,
-                256
-            );
-            return toBase64(derivedBits);
+        function getAuthRedirectUrl() {
+            const redirectUrl = new URL(window.location.href);
+            redirectUrl.search = "";
+            redirectUrl.hash = "";
+            return redirectUrl.toString();
+        }
+
+        function selectFreshTracks(tracks, historyKey, getTrackId, limit = 5) {
+            const uniqueTracks = [...new Map(tracks
+                .filter((track) => getTrackId(track))
+                .map((track) => [String(getTrackId(track)), track])).values()];
+            const history = trackHistoryBySource.get(historyKey) || new Set();
+            const currentIds = currentMix.id.startsWith(`${historyKey}-`)
+                ? new Set(currentTracks.map((track) => String(getTrackId(track))).filter(Boolean))
+                : new Set();
+            let eligibleTracks = uniqueTracks.filter((track) => !currentIds.has(String(getTrackId(track))));
+            if (!eligibleTracks.length) eligibleTracks = uniqueTracks;
+
+            let freshTracks = eligibleTracks.filter((track) => !history.has(String(getTrackId(track))));
+            if (!freshTracks.length) {
+                history.clear();
+                freshTracks = eligibleTracks;
+            }
+
+            const shuffle = (items) => {
+                const result = [...items];
+                for (let index = result.length - 1; index > 0; index -= 1) {
+                    const swapIndex = Math.floor(Math.random() * (index + 1));
+                    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+                }
+                return result;
+            };
+            const selectedTracks = shuffle(freshTracks).slice(0, limit);
+            if (selectedTracks.length < Math.min(limit, uniqueTracks.length)) {
+                const selectedIds = new Set(selectedTracks.map((track) => String(getTrackId(track))));
+                selectedTracks.push(...shuffle(eligibleTracks.filter((track) => !selectedIds.has(String(getTrackId(track)))))
+                    .slice(0, Math.min(limit, uniqueTracks.length) - selectedTracks.length));
+            }
+            selectedTracks.forEach((track) => history.add(String(getTrackId(track))));
+            trackHistoryBySource.set(historyKey, history);
+            return selectedTracks;
         }
 
         function getSpotifyConnection() {
@@ -1336,15 +1528,20 @@
         function updateSpotifyConnectionUI() {
             const connection = getSpotifyConnection();
             const appleConnection = getAppleConnection();
+            const canWriteSpotify = Boolean(connection?.scope?.split(" ").includes("playlist-modify-private"));
             const state = document.querySelector("#spotify-state");
             const appleState = document.querySelector("#apple-state");
             const clientId = localStorage.getItem(spotifyClientIdKey) || "";
             spotifyClientIdInput.value = clientId;
             document.querySelector("#spotify-redirect-uri").textContent = getSpotifyRedirectUri();
-            state.textContent = connection ? `Connected as ${connection.displayName}` : "Not connected";
+            state.textContent = connection
+                ? canWriteSpotify ? `Connected as ${connection.displayName}` : "Reconnect to enable playlist saving"
+                : "Not connected";
             state.dataset.connected = String(Boolean(connection));
             document.querySelector("#spotify-config").hidden = Boolean(connection);
-            spotifyActionButton.textContent = connection ? "Disconnect Spotify" : "Connect Spotify";
+            spotifyActionButton.textContent = connection
+                ? canWriteSpotify ? "Disconnect Spotify" : "Reconnect Spotify"
+                : "Connect Spotify";
             appleState.textContent = appleConnection ? "Connected" : "Not connected";
             appleState.dataset.connected = String(Boolean(appleConnection));
             document.querySelector("#apple-config").hidden = Boolean(appleConnection);
@@ -1353,6 +1550,12 @@
             document.querySelector("#connect-button-label").textContent = connectedServices.length
                 ? connectedServices.length > 1 ? `${connectedServices.length} connected` : connectedServices[0]
                 : "Connect";
+            addToSpotifyButton.disabled = !canWriteSpotify;
+            addToSpotifyButton.title = canWriteSpotify
+                ? "Create a private Spotify playlist"
+                : "Connect or reconnect Spotify to allow playlist creation";
+            addToAppleButton.disabled = !appleConnection;
+            addToAppleButton.title = appleConnection ? "Create an Apple Music playlist" : "Connect Apple Music to save playlists";
         }
 
         function openConnectDialog() {
@@ -1390,14 +1593,13 @@
 
             localStorage.setItem(spotifyClientIdKey, clientId);
             sessionStorage.setItem(spotifyOAuthKey, JSON.stringify(request));
-            sessionStorage.setItem("tuneup-session-username", document.querySelector("#account-name").textContent.replace(/^Signed in as /, ""));
 
             const authorizationUrl = new URL("https://accounts.spotify.com/authorize");
             authorizationUrl.search = new URLSearchParams({
                 client_id: clientId,
                 response_type: "code",
                 redirect_uri: redirectUri,
-                scope: "user-read-private",
+                scope: "user-read-private playlist-modify-private playlist-modify-public",
                 code_challenge_method: "S256",
                 code_challenge: challenge,
                 state
@@ -1415,9 +1617,6 @@
             const returnedState = callbackUrl.searchParams.get("state");
             history.replaceState(null, "", `${callbackUrl.pathname}${callbackUrl.hash}`);
             sessionStorage.removeItem(spotifyOAuthKey);
-
-            const accountUsername = sessionStorage.getItem("tuneup-session-username");
-            if (accountUsername && localStorage.getItem(accountKey(accountUsername))) showPlaylist(accountUsername);
 
             if (providerError || !request || returnedState !== request.state) {
                 setConnectionMessage(providerError ? "Spotify sign-in was cancelled." : "Spotify sign-in could not be verified. Try connecting again.", "error");
@@ -1449,11 +1648,12 @@
                 sessionStorage.setItem(spotifySessionKey, JSON.stringify({
                     accessToken: tokenData.access_token,
                     expiresAt: Date.now() + tokenData.expires_in * 1000,
+                    scope: tokenData.scope || "user-read-private playlist-modify-private playlist-modify-public",
                     displayName: profile.display_name || profile.id
                 }));
 
-                const username = sessionStorage.getItem("tuneup-session-username");
-                if (username && localStorage.getItem(accountKey(username))) showPlaylist(username);
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) showPlaylist(user.user_metadata?.username || user.email);
                 updateSpotifyConnectionUI();
                 setConnectionMessage(`Connected to Spotify as ${profile.display_name || profile.id}.`, "success");
                 connectDialog.showModal();
@@ -1477,7 +1677,8 @@
                 if (!response.ok) throw new Error("Spotify couldn't load R&B tracks right now.");
                 if (requestId !== spotifySearchRequest || selectedGenre !== "rnb" || !result.tracks.items.length) return;
 
-                const tracks = result.tracks.items.slice(0, 5).map((track, index) => ({
+                const tracks = selectFreshTracks(result.tracks.items.map((track, index) => ({
+                    spotifyId: track.id,
                     title: track.name,
                     artist: track.artists.map((artist) => artist.name).join(", "),
                     duration: `${Math.floor(track.duration_ms / 60000)}:${String(Math.floor(track.duration_ms / 1000) % 60).padStart(2, "0")}`,
@@ -1485,7 +1686,8 @@
                     preview: track.preview_url,
                     externalUrl: track.external_urls.spotify,
                     provider: "Spotify"
-                }));
+                })), "spotify-rnb", (track) => track.spotifyId);
+                if (!tracks.length) throw new Error("Spotify didn't return any R&B tracks to add.");
                 currentMix = { ...currentMix, id: `spotify-rnb-${requestId}`, title: "Spotify R&B Picks", mood: "From Spotify's R&B catalog", tracks };
                 currentTracks = [...tracks];
                 renderPlaylist();
@@ -1563,9 +1765,10 @@
                 const songs = result.results?.songs?.data || [];
                 if (requestId !== appleSearchRequest || selectedGenre !== "rnb" || !songs.length) return;
 
-                const tracks = songs.slice(0, 5).map((song, index) => {
+                const tracks = selectFreshTracks(songs.map((song, index) => {
                     const artwork = song.attributes.artwork;
                     return {
+                        appleCatalogId: song.id,
                         title: song.attributes.name,
                         artist: song.attributes.artistName,
                         duration: song.attributes.durationInMillis
@@ -1578,7 +1781,8 @@
                         externalUrl: song.attributes.url,
                         provider: "Apple Music"
                     };
-                });
+                }), "apple-rnb", (track) => track.appleCatalogId);
+                if (!tracks.length) throw new Error("Apple Music didn't return any R&B tracks to add.");
                 currentMix = { ...currentMix, id: `apple-rnb-${requestId}`, title: "Apple Music R&B Picks", mood: "From Apple Music's R&B catalog", tracks };
                 currentTracks = [...tracks];
                 renderPlaylist();
@@ -1780,22 +1984,129 @@
             renderPlaylist();
         }
 
+        function renderGenreOptions() {
+            genreOptions.replaceChildren(...genreOptionItems.map((genre) => {
+                const option = document.createElement("div");
+                option.className = "genre-option";
+                option.id = `genre-option-${genre.id}`;
+                option.dataset.genreId = String(genre.id);
+                option.setAttribute("role", "option");
+                option.setAttribute("aria-selected", String(genre.id === selectedGenreId));
+                option.tabIndex = -1;
+                option.textContent = genre.name;
+                return option;
+            }));
+            const selectedGenreOption = genreOptionItems.find((genre) => genre.id === selectedGenreId);
+            if (selectedGenreOption) {
+                selectedGenreName = selectedGenreOption.name;
+                genreSelectedValue.textContent = selectedGenreName;
+            }
+        }
+
+        function setGenreMenuOpen(isOpen, focusSelected = false) {
+            genreOptions.hidden = !isOpen;
+            genreTrigger.setAttribute("aria-expanded", String(isOpen));
+            if (!isOpen) return;
+
+            const selectedOption = genreOptions.querySelector('[aria-selected="true"]');
+            const firstOption = genreOptions.querySelector('[role="option"]');
+            (focusSelected ? selectedOption || firstOption : firstOption)?.focus();
+        }
+
+        function focusGenreOption(index) {
+            const options = [...genreOptions.querySelectorAll('[role="option"]')];
+            if (!options.length) return;
+            options[Math.max(0, Math.min(index, options.length - 1))].focus();
+        }
+
+        function changeGenre(genreId, genreName) {
+            selectedGenreId = Number(genreId);
+            selectedGenreName = genreName;
+            selectedGenre = selectedGenreId === 0
+                ? "all"
+                : selectedGenreId === 165
+                    ? "rnb"
+                    : normalizeTrackText(selectedGenreName).replace(/\s+/g, "-");
+            renderGenreOptions();
+            setGenreMenuOpen(false);
+            genreTrigger.focus();
+
+            if (selectedGenre === "rnb" && (getSpotifyConnection() || getAppleConnection())) {
+                loadConnectedRnbTracks();
+            } else {
+                loadGenrePlaylist(selectedGenreId, selectedGenreName);
+            }
+        }
+
+        genreTrigger.addEventListener("click", () => {
+            setGenreMenuOpen(genreOptions.hidden, true);
+        });
+
+        genreTrigger.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                setGenreMenuOpen(true, true);
+            } else if (event.key === "Escape" && !genreOptions.hidden) {
+                setGenreMenuOpen(false);
+            }
+        });
+
+        genreOptions.addEventListener("click", (event) => {
+            const option = event.target.closest('[role="option"]');
+            if (!option) return;
+            changeGenre(option.dataset.genreId, option.textContent);
+        });
+
+        genreOptions.addEventListener("keydown", (event) => {
+            const options = [...genreOptions.querySelectorAll('[role="option"]')];
+            const focusedIndex = options.indexOf(document.activeElement);
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                event.preventDefault();
+                focusGenreOption(focusedIndex + (event.key === "ArrowDown" ? 1 : -1));
+            } else if (event.key === "Home" || event.key === "End") {
+                event.preventDefault();
+                focusGenreOption(event.key === "Home" ? 0 : options.length - 1);
+            } else if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                document.activeElement.click();
+            } else if (event.key === "Escape") {
+                event.preventDefault();
+                setGenreMenuOpen(false);
+                genreTrigger.focus();
+            } else if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                genreTypeahead += event.key;
+                clearTimeout(genreTypeaheadTimeout);
+                genreTypeaheadTimeout = setTimeout(() => { genreTypeahead = ""; }, 700);
+                const prefix = normalizeTrackText(genreTypeahead);
+                const match = options.find((option) => normalizeTrackText(option.textContent).startsWith(prefix));
+                if (match) match.focus();
+            }
+        });
+
+        document.addEventListener("pointerdown", (event) => {
+            if (!genreMenuWrap.contains(event.target)) setGenreMenuOpen(false);
+        });
+
         async function loadGenreOptions() {
             try {
                 const response = await fetch("https://api.deezer.com/genre");
                 if (!response.ok) throw new Error("Genre list unavailable.");
                 const result = await response.json();
-                const options = [new Option("All genres", "0"), ...result.data
-                    .filter((genre) => genre.id !== 0)
-                    .map((genre) => new Option(genre.name, String(genre.id)))];
-                genreSelect.replaceChildren(...options);
-                genreSelect.value = String(selectedGenreId);
-            } catch {
-                playlistStatus.textContent = "The complete genre list couldn't load. Try refreshing when you're online.";
+                if (!Array.isArray(result.data)) throw new Error("The genre list response was invalid.");
+                genreOptionItems = [
+                    { id: 0, name: "All genres" },
+                    ...result.data
+                        .filter((genre) => genre.id !== 0)
+                        .map((genre) => ({ id: Number(genre.id), name: genre.name }))
+                ];
+                renderGenreOptions();
+            } catch (error) {
+                renderGenreOptions();
+                playlistStatus.textContent = `${error.message || "The complete genre list couldn't load."} Showing the available genres instead.`;
             }
         }
 
-        async function loadGenrePlaylist(genreId = selectedGenreId, genreName = selectedGenreName, excludeCurrent = false) {
+        async function loadGenrePlaylist(genreId = selectedGenreId, genreName = selectedGenreName) {
             const requestId = ++genreRequestId;
             selectedGenreId = Number(genreId);
             selectedGenreName = genreName;
@@ -1804,7 +2115,7 @@
                 : selectedGenreId === 165
                     ? "rnb"
                     : normalizeTrackText(genreName).replace(/\s+/g, "-");
-            genreSelect.value = String(selectedGenreId);
+            renderGenreOptions();
             stopPreview();
             playlistStatus.textContent = `Finding ${selectedGenreName.toLowerCase()} tracks...`;
 
@@ -1817,18 +2128,11 @@
                 const availableTracks = (result.data || []).filter((track) => track.preview && track.album?.cover_medium);
                 if (!availableTracks.length) throw new Error(`There aren't playable ${selectedGenreName.toLowerCase()} previews right now.`);
 
-                const previousIds = new Set(currentTracks.map((track) => track.id));
-                const freshTracks = excludeCurrent
-                    ? availableTracks.filter((track) => !previousIds.has(track.id))
-                    : availableTracks;
-                const pool = freshTracks.length >= Math.min(5, availableTracks.length) ? freshTracks : availableTracks;
-                const shuffled = [...pool];
-                for (let index = shuffled.length - 1; index > 0; index -= 1) {
-                    const swapIndex = Math.floor(Math.random() * (index + 1));
-                    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-                }
-
-                const tracks = shuffled.slice(0, 5).map((track) => ({
+                const tracks = selectFreshTracks(
+                    availableTracks,
+                    `deezer-chart-${selectedGenreId}`,
+                    (track) => track.id
+                ).map((track) => ({
                     id: track.id,
                     title: track.title,
                     artist: track.artist.name,
@@ -1854,17 +2158,174 @@
             }
         }
 
+        function bestCatalogMatch(track, candidates) {
+            const expectedTitle = normalizeTrackText(track.title);
+            const expectedArtist = normalizeTrackText(track.artist).split(" feat ")[0];
+            const expectedArtists = expectedArtist.split(" ").filter((word) => word.length > 1);
+            return candidates
+                .filter((candidate) => normalizeTrackText(candidate.title) === expectedTitle)
+                .map((candidate) => {
+                    const actualArtist = normalizeTrackText(candidate.artist);
+                    const artistMatches = expectedArtist && actualArtist.includes(expectedArtist)
+                        ? expectedArtists.length + 1
+                        : expectedArtists.filter((word) => actualArtist.includes(word)).length;
+                    return { candidate, artistMatches };
+                })
+                .filter((match) => match.artistMatches > 0)
+                .sort((first, second) => second.artistMatches - first.artistMatches)[0]?.candidate || null;
+        }
+
+        async function findSpotifyTrack(track, connection) {
+            if (track.spotifyId) return track.spotifyId;
+            const query = new URLSearchParams({
+                q: `track:${track.title} artist:${track.artist}`,
+                type: "track",
+                limit: "10"
+            });
+            const response = await fetch(`https://api.spotify.com/v1/search?${query}`, {
+                headers: { Authorization: `Bearer ${connection.accessToken}` }
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error?.message || "Spotify couldn't search for playlist tracks.");
+            const match = bestCatalogMatch(track, (result.tracks?.items || []).map((item) => ({
+                id: item.id,
+                title: item.name,
+                artist: item.artists.map((artist) => artist.name).join(" ")
+            })));
+            return match?.id || null;
+        }
+
+        async function addPlaylistToSpotify() {
+            const connection = getSpotifyConnection();
+            if (!connection) {
+                playlistStatus.textContent = "Connect Spotify first to save this playlist.";
+                return;
+            }
+
+            addToSpotifyButton.disabled = true;
+            addToSpotifyButton.textContent = "Saving to Spotify...";
+            try {
+                const matches = await Promise.all(currentTracks.map(async (track) => ({
+                    track,
+                    id: await findSpotifyTrack(track, connection)
+                })));
+                const matchedIds = matches.filter((match) => match.id).map((match) => `spotify:track:${match.id}`);
+                if (!matchedIds.length) throw new Error("Spotify couldn't find any matching tracks, so no playlist was created.");
+
+                const createResponse = await fetch("https://api.spotify.com/v1/me/playlists", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${connection.accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: currentMix.title,
+                        description: `Created with TuneUp · ${currentMix.genreLabel || selectedGenreName} mix`,
+                        public: false
+                    })
+                });
+                const playlist = await createResponse.json();
+                if (!createResponse.ok) throw new Error(playlist.error?.message || "Spotify couldn't create the playlist.");
+
+                const addResponse = await fetch(`https://api.spotify.com/v1/playlists/${encodeURIComponent(playlist.id)}/tracks`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${connection.accessToken}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ uris: matchedIds })
+                });
+                const addResult = await addResponse.json();
+                if (!addResponse.ok) throw new Error(addResult.error?.message || "Spotify created the playlist but couldn't add its tracks.");
+
+                const skipped = currentTracks.length - matchedIds.length;
+                playlistStatus.textContent = `Added ${matchedIds.length} of ${currentTracks.length} tracks to Spotify${skipped ? `; ${skipped} unmatched tracks were skipped` : ""}.`;
+            } catch (error) {
+                playlistStatus.textContent = error.message || "Could not save this playlist to Spotify.";
+            } finally {
+                addToSpotifyButton.textContent = "Add to Spotify";
+                updateSpotifyConnectionUI();
+            }
+        }
+
+        async function findAppleMusicTrack(track, connection) {
+            if (track.appleCatalogId) return track.appleCatalogId;
+            const query = new URLSearchParams({
+                term: `${track.title} ${track.artist}`,
+                types: "songs",
+                limit: "10"
+            });
+            const response = await fetch(`https://api.music.apple.com/v1/catalog/us/search?${query}`, {
+                headers: {
+                    Authorization: `Bearer ${connection.developerToken}`,
+                    "Music-User-Token": connection.musicUserToken
+                }
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.errors?.[0]?.detail || "Apple Music couldn't search for playlist tracks.");
+            const match = bestCatalogMatch(track, (result.results?.songs?.data || []).map((song) => ({
+                id: song.id,
+                title: song.attributes.name,
+                artist: song.attributes.artistName
+            })));
+            return match?.id || null;
+        }
+
+        async function addPlaylistToAppleMusic() {
+            const connection = getAppleConnection();
+            if (!connection) {
+                playlistStatus.textContent = "Connect Apple Music first to save this playlist.";
+                return;
+            }
+
+            addToAppleButton.disabled = true;
+            addToAppleButton.textContent = "Saving to Apple Music...";
+            try {
+                const matches = await Promise.all(currentTracks.map(async (track) => ({
+                    track,
+                    id: await findAppleMusicTrack(track, connection)
+                })));
+                const songs = matches.filter((match) => match.id).map((match) => ({ id: match.id, type: "songs" }));
+                if (!songs.length) throw new Error("Apple Music couldn't find any matching tracks, so no playlist was created.");
+
+                const response = await fetch("https://api.music.apple.com/v1/me/library/playlists", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${connection.developerToken}`,
+                        "Music-User-Token": connection.musicUserToken,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        attributes: {
+                            name: currentMix.title,
+                            description: `Created with TuneUp · ${currentMix.genreLabel || selectedGenreName} mix`
+                        },
+                        relationships: { tracks: { data: songs } }
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.errors?.[0]?.detail || "Apple Music couldn't create the playlist.");
+
+                const skipped = currentTracks.length - songs.length;
+                playlistStatus.textContent = `Added ${songs.length} of ${currentTracks.length} tracks to Apple Music${skipped ? `; ${skipped} unmatched tracks were skipped` : ""}.`;
+            } catch (error) {
+                playlistStatus.textContent = error.message || "Could not save this playlist to Apple Music.";
+            } finally {
+                addToAppleButton.textContent = "Add to Apple Music";
+                updateSpotifyConnectionUI();
+            }
+        }
+
         function showPlaylist(username) {
             document.querySelector("#form-content").hidden = true;
             playlistView.hidden = false;
             page.classList.add("is-app");
-            sessionStorage.setItem("tuneup-session-username", username);
             document.querySelector("#account-name").textContent = `Signed in as ${username}`;
             updateSpotifyConnectionUI();
             selectedGenre = "all";
             selectedGenreId = 0;
             selectedGenreName = "All genres";
-            genreSelect.value = "0";
+            renderGenreOptions();
             playlistStatus.textContent = "";
             loadGenreOptions();
             loadGenrePlaylist(0, "All genres");
@@ -1872,6 +2333,15 @@
 
         loginMode.addEventListener("click", () => setMode(false));
         signupMode.addEventListener("click", () => setMode(true));
+        forgotPasswordButton.addEventListener("click", () => {
+            if (authMode === "recovery") {
+                setMode(false);
+                emailInput.focus();
+            } else {
+                setRecoveryMode();
+                emailInput.focus();
+            }
+        });
 
         document.querySelector("#open-connect-dialog").addEventListener("click", openConnectDialog);
         document.querySelector("#close-connect-dialog").addEventListener("click", () => connectDialog.close());
@@ -1889,7 +2359,16 @@
         });
 
         spotifyActionButton.addEventListener("click", async () => {
-            if (getSpotifyConnection()) {
+            const connection = getSpotifyConnection();
+            if (connection && !connection.scope?.split(" ").includes("playlist-modify-private")) {
+                try {
+                    await startSpotifyAuthorization();
+                } catch (error) {
+                    setConnectionMessage(error.message || "Spotify sign-in couldn't be started.", "error");
+                }
+                return;
+            }
+            if (connection) {
                 sessionStorage.removeItem(spotifySessionKey);
                 spotifySearchRequest += 1;
                 updateSpotifyConnectionUI();
@@ -1934,112 +2413,152 @@
             event.currentTarget.setAttribute("aria-pressed", String(show));
         });
 
-        document.querySelector("#shuffle-button").addEventListener("click", () => {
+        function loadAnotherPlaylist() {
             stopPreview();
-            for (let index = currentTracks.length - 1; index > 0; index -= 1) {
-                const swapIndex = Math.floor(Math.random() * (index + 1));
-                [currentTracks[index], currentTracks[swapIndex]] = [currentTracks[swapIndex], currentTracks[index]];
-            }
-            renderPlaylist();
-            playlistStatus.textContent = `Shuffled ${currentMix.title}.`;
-        });
-
-        genreSelect.addEventListener("change", () => {
-            selectedGenreId = Number(genreSelect.value);
-            selectedGenreName = genreSelect.selectedOptions[0].textContent;
-            selectedGenre = selectedGenreId === 0
-                ? "all"
-                : selectedGenreId === 165
-                    ? "rnb"
-                    : normalizeTrackText(selectedGenreName).replace(/\s+/g, "-");
-
             if (selectedGenre === "rnb" && (getSpotifyConnection() || getAppleConnection())) {
+                playlistStatus.textContent = "Finding fresh R&B tracks...";
                 loadConnectedRnbTracks();
             } else {
                 loadGenrePlaylist(selectedGenreId, selectedGenreName);
             }
-        });
+        }
+
+        document.querySelector("#shuffle-button").addEventListener("click", loadAnotherPlaylist);
+
+        addToSpotifyButton.addEventListener("click", addPlaylistToSpotify);
+        addToAppleButton.addEventListener("click", addPlaylistToAppleMusic);
 
         document.querySelector("#new-playlist-button").addEventListener("click", () => {
-            loadGenrePlaylist(selectedGenreId, selectedGenreName, true);
+            loadAnotherPlaylist();
         });
 
         accountForm.addEventListener("submit", async (event) => {
             event.preventDefault();
+            const email = emailInput.value.trim();
             const username = usernameInput.value.trim();
             const password = passwordInput.value;
 
-            if (!/^[a-zA-Z0-9._-]{3,24}$/.test(username)) {
+            if (!supabaseClient) {
+                setStatus(supabaseConfigurationError || "Account service isn't configured. Set the Supabase project URL and anon key, then enable email sign-in.", "error");
+                authSetupNote.hidden = false;
+                return;
+            }
+
+            if (authMode !== "reset" && (!email || !emailInput.validity.valid)) {
+                setStatus("Enter a valid email address.", "error");
+                emailInput.focus();
+                return;
+            }
+
+            if (authMode === "signup" && !/^[a-zA-Z0-9._-]{3,24}$/.test(username)) {
                 setStatus("Choose a username with 3 to 24 letters, numbers, dots, dashes, or underscores.", "error");
                 usernameInput.focus();
                 return;
             }
 
-            if (isCreatingAccount && password.length < 8) {
-                setStatus("Your password needs at least 8 characters.", "error");
+            if ((authMode === "signup" || authMode === "reset") && (password.length < 8 || password.length > 128)) {
+                setStatus("Your password must be between 8 and 128 characters.", "error");
                 passwordInput.focus();
                 return;
             }
 
-            if (!password) {
+            if ((authMode === "signup" || authMode === "login" || authMode === "reset") && !password) {
                 setStatus("Enter your password to continue.", "error");
                 passwordInput.focus();
                 return;
             }
 
             const button = document.querySelector("#submit-button");
+            const submittedMode = authMode;
             button.disabled = true;
-            submitLabel.textContent = isCreatingAccount ? "Creating account..." : "Checking...";
+            submitLabel.textContent = authMode === "signup"
+                ? "Creating account..."
+                : authMode === "login"
+                    ? "Checking..."
+                    : authMode === "recovery"
+                        ? "Sending email..."
+                        : "Saving password...";
 
             try {
-                const key = accountKey(username);
-                const savedAccount = localStorage.getItem(key);
-
-                if (isCreatingAccount) {
-                    if (savedAccount) {
-                        setStatus("That username is already in use on this browser.", "error");
-                        return;
-                    }
-                    const salt = crypto.getRandomValues(new Uint8Array(16));
-                    const hash = await derivePasswordHash(password, salt);
-                    localStorage.setItem(key, JSON.stringify({ salt: toBase64(salt), hash }));
-                    showPlaylist(username);
-                    return;
+                if (authMode === "signup") {
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email,
+                        password,
+                        options: {
+                            data: { username },
+                            emailRedirectTo: getAuthRedirectUrl()
+                        }
+                    });
+                    if (error) throw error;
+                    if (data.session) showPlaylist(username);
+                    else setStatus("Check your email to confirm your account before signing in.", "success");
+                } else if (authMode === "login") {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    showPlaylist(data.user.user_metadata?.username || data.user.email);
+                } else if (authMode === "recovery") {
+                    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                        redirectTo: getAuthRedirectUrl()
+                    });
+                    if (error) throw error;
+                    setStatus("If an account exists for that email, a password-reset link is on its way.", "success");
+                } else {
+                    const { error } = await supabaseClient.auth.updateUser({ password });
+                    if (error) throw error;
+                    const { error: signOutError } = await supabaseClient.auth.signOut();
+                    if (signOutError) throw signOutError;
+                    setMode(false);
+                    emailInput.value = email;
+                    setStatus("Password updated. Sign in with your new password.", "success");
                 }
-
-                if (!savedAccount) {
-                    setStatus("We couldn't find an account with that username on this browser.", "error");
-                    return;
-                }
-
-                const account = JSON.parse(savedAccount);
-                const salt = Uint8Array.from(atob(account.salt), (character) => character.charCodeAt(0));
-                const hash = await derivePasswordHash(password, salt);
-                if (hash !== account.hash) {
-                    setStatus("That password doesn't match. Try again.", "error");
-                    return;
-                }
-
-                showPlaylist(username);
             } catch (error) {
                 console.error("TuneUp account flow failed:", error);
-                setStatus("Accounts need browser storage and a secure connection. Try opening TuneUp on localhost.", "error");
+                setStatus(error.message || "The account request failed. Please try again.", "error");
             } finally {
                 button.disabled = false;
-                submitLabel.textContent = isCreatingAccount ? "Create account" : "Log in";
+                if (authMode === submittedMode) {
+                    submitLabel.textContent = authMode === "signup"
+                        ? "Create account"
+                        : authMode === "login"
+                            ? "Log in"
+                            : authMode === "recovery"
+                                ? "Send recovery email"
+                                : "Save new password";
+                }
             }
         });
 
-        document.querySelector("#signout-button").addEventListener("click", () => {
+        document.querySelector("#signout-button").addEventListener("click", async () => {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) {
+                playlistStatus.textContent = error.message || "Could not sign out.";
+                return;
+            }
             stopPreview();
-            sessionStorage.removeItem("tuneup-session-username");
             playlistView.hidden = true;
             document.querySelector("#form-content").hidden = false;
             page.classList.remove("is-app");
             accountForm.reset();
             setMode(false);
-            usernameInput.focus();
+            emailInput.focus();
         });
+
+        setMode(false);
+        authSetupNote.hidden = Boolean(supabaseClient);
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange((event) => {
+                if (event === "PASSWORD_RECOVERY") setResetMode();
+            });
+            supabaseClient.auth.getSession().then(({ data, error }) => {
+                if (error) {
+                    setStatus(error.message || "Could not restore your account session.", "error");
+                    return;
+                }
+                if (data.session?.user) showPlaylist(data.session.user.user_metadata?.username || data.session.user.email);
+            }).catch((error) => {
+                setStatus(error.message || "Could not restore your account session.", "error");
+            });
+        }
 
         updateSpotifyConnectionUI();
         completeSpotifyAuthorization();
