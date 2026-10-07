@@ -1014,6 +1014,7 @@
                             <span id="submit-label">Log in</span>
                             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
+                        <button class="text-button" id="resend-confirmation-button" type="button" hidden>Resend confirmation email</button>
                         <p class="status" id="status" role="status" aria-live="polite"></p>
                     </form>
                     <p class="field-hint auth-setup-note" id="auth-setup-note" hidden>Account sign-in needs configuration. Set the Supabase project URL and anon key in this page, enable email sign-in, and add this site to Supabase's redirect URL allow list. <a href="./SUPABASE_SETUP.md" target="_blank" rel="noreferrer">Setup instructions</a>.</p>
@@ -1166,6 +1167,7 @@
         const modeSwitch = document.querySelector(".mode-switch");
         const passwordHint = document.querySelector("#password-hint");
         const forgotPasswordButton = document.querySelector("#forgot-password-button");
+        const resendConfirmationButton = document.querySelector("#resend-confirmation-button");
         const authSetupNote = document.querySelector("#auth-setup-note");
         const formTitle = document.querySelector("#form-title");
         const formIntro = document.querySelector("#form-intro");
@@ -1405,6 +1407,7 @@
             passwordHint.textContent = "Use 8–128 characters.";
             forgotPasswordButton.hidden = createAccount;
             forgotPasswordButton.textContent = "Forgot password?";
+            resendConfirmationButton.hidden = !createAccount;
             modeSwitch.hidden = false;
             document.querySelector("#submit-button").hidden = false;
             setStatus("");
@@ -1424,6 +1427,7 @@
             passwordHint.hidden = true;
             forgotPasswordButton.hidden = false;
             forgotPasswordButton.textContent = "Back to log in";
+            resendConfirmationButton.hidden = true;
             submitLabel.textContent = "Send recovery email";
             document.querySelector("#submit-button").hidden = false;
             setStatus("");
@@ -1447,16 +1451,21 @@
             passwordHint.hidden = false;
             passwordHint.textContent = "Use 8–128 characters.";
             forgotPasswordButton.hidden = true;
+            resendConfirmationButton.hidden = true;
             submitLabel.textContent = "Save new password";
             document.querySelector("#submit-button").hidden = false;
             setStatus("");
         }
 
         function getAuthRedirectUrl() {
-            const redirectUrl = new URL(window.location.href);
-            redirectUrl.search = "";
-            redirectUrl.hash = "";
-            return redirectUrl.toString();
+            return "https://jacquelineg04.github.io/TuneUp/";
+        }
+
+        function getAuthErrorMessage(error) {
+            if (error.status === 429 || error.code === "over_email_send_rate_limit" || /email rate limit|only request this after/i.test(error.message || "")) {
+                return "Too many confirmation emails were requested. Wait for Supabase's rate limit to clear before trying again. If this keeps happening, configure custom SMTP in Supabase.";
+            }
+            return error.message || "The account request failed. Please try again.";
         }
 
         function selectFreshTracks(tracks, historyKey, getTrackId, limit = 5) {
@@ -2513,7 +2522,7 @@
                 }
             } catch (error) {
                 console.error("TuneUp account flow failed:", error);
-                setStatus(error.message || "The account request failed. Please try again.", "error");
+                setStatus(getAuthErrorMessage(error), "error");
             } finally {
                 button.disabled = false;
                 if (authMode === submittedMode) {
@@ -2525,6 +2534,37 @@
                                 ? "Send recovery email"
                                 : "Save new password";
                 }
+            }
+        });
+
+        resendConfirmationButton.addEventListener("click", async () => {
+            if (!supabaseClient) {
+                setStatus(supabaseConfigurationError || "Account service isn't configured.", "error");
+                authSetupNote.hidden = false;
+                return;
+            }
+            if (!emailInput.value.trim() || !emailInput.validity.valid) {
+                setStatus("Enter a valid email address first.", "error");
+                emailInput.focus();
+                return;
+            }
+
+            resendConfirmationButton.disabled = true;
+            resendConfirmationButton.textContent = "Sending...";
+            try {
+                const { error } = await supabaseClient.auth.resend({
+                    type: "signup",
+                    email: emailInput.value.trim(),
+                    options: { emailRedirectTo: getAuthRedirectUrl() }
+                });
+                if (error) throw error;
+                setStatus("If that account needs confirmation, a new email will arrive shortly. Check your spam folder too.", "success");
+            } catch (error) {
+                console.error("TuneUp confirmation resend failed:", error);
+                setStatus(getAuthErrorMessage(error), "error");
+            } finally {
+                resendConfirmationButton.disabled = false;
+                resendConfirmationButton.textContent = "Resend confirmation email";
             }
         });
 
