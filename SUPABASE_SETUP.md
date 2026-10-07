@@ -1,0 +1,26 @@
+# TuneUp service setup
+
+TuneUp is a static page. Account recovery and playlist export need the following provider configuration before they can be used.
+
+## Supabase accounts and password recovery
+
+1. Create a Supabase project and enable email/password sign-in under **Authentication → Providers → Email**.
+2. Configure an SMTP provider under **Project Settings → Authentication → SMTP Settings**. Supabase's built-in email service is intended for testing and may only send to authorized addresses.
+3. Add the deployed site URL under **Authentication → URL Configuration → Site URL** and add the exact deployed page URL to the redirect URL allow list.
+4. The project URL and public publishable key are configured in `index.html`. Keep them pointed at the project root URL (not its `/rest/v1/` REST endpoint). Never put a Supabase `service_role` key in this page.
+5. Set the minimum password length to 8 in Supabase Auth settings. TuneUp's account form accepts passwords from 8 through 128 characters and usernames from 3 through 24 letters, numbers, dots, dashes, or underscores.
+6. Configure the confirmation and password-recovery email templates to link back to the deployed page.
+
+Login uses email and password. New accounts also collect a username. The previous browser-only demo accounts are not migrated to Supabase.
+
+## Spotify playlist export
+
+Create a Spotify developer app, enter its Client ID in TuneUp, and register the callback URL shown in the connection dialog. Connect Spotify and approve the playlist modification permissions. Users with an older read-only connection should use **Reconnect Spotify** to approve the new permissions.
+
+TuneUp searches Spotify for each track by title and artist, creates a private playlist, and adds the tracks it can match. Unmatched tracks are reported and skipped.
+
+## Apple Music playlist export
+
+An Apple Developer account, MusicKit configuration, and a server that issues short-lived MusicKit developer tokens are required. Paste a valid developer token in the Apple Music connection dialog and authorize TuneUp with the MusicKit prompt. Do not put the Apple private signing key in `index.html`.
+
+TuneUp searches Apple Music for each track by title and artist, creates a library playlist, and includes the tracks it can match. Unmatched tracks are reported and skipped.
